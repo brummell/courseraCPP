@@ -11,9 +11,9 @@
 using namespace std;
 
 template <typename T>
-inline T sum(const vector<T>& summable) {
+inline T sum(const vector<T>& numeric) {
     T accum = 0;
-    for (const auto& i : summable) {
+    for (const auto& i : numeric) {
         accum += i;
     }
     return accum;
