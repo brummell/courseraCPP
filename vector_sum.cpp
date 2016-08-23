@@ -6,12 +6,12 @@
 // inline any short function - CHECK
 
 #include <iostream>
-#include <vector>
+//#include <vector>
 
 using namespace std;
 
 template <typename T>
-inline T sum(const vector<T>& numeric) {
+inline T sum(const vector<T>& numeric) {`
     T accum = 0;
     for (const auto& i : numeric) {
         accum += i;
