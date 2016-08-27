@@ -40,8 +40,8 @@ class Graph {
     // undirected acyclic graph, strictly positive weights (0==no edge)
     // adjacency list representation for now... binary heap allows faster Dykstra's
     // WILL CREATE DIFFERENT  STRUCTS ETC DEPENDING ON CONSTRUCTION (DENSITY, DIRECTEDNESS, ETC)
-
-
+    // TODO: Add DAG, UAG, DCG, UCG options, unweighted as well
+    // TODO: add iterator?
     public:
         // constructors
 
@@ -117,16 +117,18 @@ class Graph {
         // for now, will just use indices... convert for nodes later.
             // assert source and destination are in set
             unordered_set<int> VminX, X, V;
-            vector<auto> A(size), B(size);
+            vector<auto> A(size);
+            vector<auto> B(size);
 
             dijkstra_greedy_crit = [](edge e) { };
             for (int i = 0; i < size; ++i) {
                 V.insert(i);
                 VminX.insert(i);
             }
-            A[source] = 0.;
 
-            while (VminX != X) {
+            A[source] = 0.;
+//            B[source] = structPath
+            while (X != V) {
 
             }
         }
