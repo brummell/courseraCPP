@@ -13,6 +13,7 @@
   <component name="ChangeListManager">
     <list default="true" id="add6c3c7-5d0e-4b7e-9463-56224e8aa3f7" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/graph.cpp" afterPath="$PROJECT_DIR$/graph.cpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/set_and_fx_helpers.cpp" afterPath="$PROJECT_DIR$/set_and_fx_helpers.cpp" />
     </list>
     <ignored path="Coursera.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -55,8 +56,8 @@
       <file leaf-file-name="graph.cpp" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/graph.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="165">
-              <caret line="42" column="63" selection-start-line="42" selection-start-column="63" selection-end-line="42" selection-end-column="63" />
+            <state relative-caret-position="225">
+              <caret line="125" column="56" selection-start-line="125" selection-start-column="56" selection-end-line="125" selection-end-column="56" />
               <folding>
                 <element signature="e#69#86#0" expanded="true" />
                 <element signature="e#147#171#0" expanded="true" />
@@ -68,14 +69,16 @@
       <file leaf-file-name="set_and_fx_helpers.cpp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/set_and_fx_helpers.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="75">
-              <caret line="20" column="26" selection-start-line="20" selection-start-column="26" selection-end-line="20" selection-end-column="26" />
+            <state relative-caret-position="195">
+              <caret line="13" column="12" selection-start-line="13" selection-start-column="12" selection-end-line="13" selection-end-column="12" />
               <folding>
-                <element signature="e#197#232#0" expanded="true" />
-                <element signature="e#330#365#0" expanded="true" />
-                <element signature="e#493#525#0" expanded="true" />
-                <element signature="e#1243#1283#0" expanded="true" />
-                <element signature="e#1642#1682#0" expanded="true" />
+                <element signature="e#510#545#0" expanded="true" />
+                <element signature="e#659#694#0" expanded="true" />
+                <element signature="e#937#972#0" expanded="true" />
+                <element signature="e#1070#1105#0" expanded="true" />
+                <element signature="e#1233#1265#0" expanded="true" />
+                <element signature="e#1983#2023#0" expanded="true" />
+                <element signature="e#2382#2422#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -377,12 +380,12 @@
       <workItem from="1470607793116" duration="6997000" />
       <workItem from="1471225349176" duration="6702000" />
       <workItem from="1471922224060" duration="14147000" />
-      <workItem from="1472276380744" duration="6261000" />
+      <workItem from="1472276380744" duration="7694000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="34337000" />
+    <option name="totallyTimeSpent" value="35770000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="831" extended-state="6" />
@@ -525,22 +528,24 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/set_and_fx_helpers.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="20" column="26" selection-start-line="20" selection-start-column="26" selection-end-line="20" selection-end-column="26" />
+        <state relative-caret-position="195">
+          <caret line="13" column="12" selection-start-line="13" selection-start-column="12" selection-end-line="13" selection-end-column="12" />
           <folding>
-            <element signature="e#197#232#0" expanded="true" />
-            <element signature="e#330#365#0" expanded="true" />
-            <element signature="e#493#525#0" expanded="true" />
-            <element signature="e#1243#1283#0" expanded="true" />
-            <element signature="e#1642#1682#0" expanded="true" />
+            <element signature="e#510#545#0" expanded="true" />
+            <element signature="e#659#694#0" expanded="true" />
+            <element signature="e#937#972#0" expanded="true" />
+            <element signature="e#1070#1105#0" expanded="true" />
+            <element signature="e#1233#1265#0" expanded="true" />
+            <element signature="e#1983#2023#0" expanded="true" />
+            <element signature="e#2382#2422#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/graph.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="42" column="63" selection-start-line="42" selection-start-column="63" selection-end-line="42" selection-end-column="63" />
+        <state relative-caret-position="225">
+          <caret line="125" column="56" selection-start-line="125" selection-start-column="56" selection-end-line="125" selection-end-column="56" />
           <folding>
             <element signature="e#69#86#0" expanded="true" />
             <element signature="e#147#171#0" expanded="true" />

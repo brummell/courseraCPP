@@ -118,9 +118,19 @@ class Graph {
             // assert source and destination are in set
             unordered_set<int> VminX, X, V;
             vector<auto> A(size);
-            vector<auto> B(size);
+            vector<auto> B(size); //TODO: something sorted
+            dijkstra_greedy_crit = [](edge e) {
+                auto min{};
+                for (auto const& x : X) {
+                    for (auto const& edge : vertices[x].edges) { //TODO: not gonna work
+                        if (VminX.count(edge.vertex)) {
+                            auto cost = A[x] + edge.weight;
 
-            dijkstra_greedy_crit = [](edge e) { };
+                        }
+                    }
+                }
+            };
+
             for (int i = 0; i < size; ++i) {
                 V.insert(i);
                 VminX.insert(i);

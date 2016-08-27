@@ -2,7 +2,27 @@
 // Created by Brummell, Doug on 8/27/16.
 //
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+// Intended to create a nice mini/pseudo DSL for sets, as well as math-y functions with
+//  them and combinators for them. Not likely to be performant or portable, but to be
+//  used to prototype algorithms in C++ in a readable, almost pseudo-code-y way.
+//* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
 #include <algorithm>
+
+template <typename Collection,typename unop>
+Collection U(Collection col, unop op){
+    // set union
+    std::for_each(col.begin(),col.end(),op);
+}
+
+template <typename Collection,typename unop>
+void intersect(Collection col, unop op){
+    // set intersection
+    std::for_each(col.begin(),col.end(),op);
+}
+
+
 
 #from http://blog.madhukaraphatak.com/functional-programming-in-c++/
 # TODO: implement/ensure implementation for Sets
