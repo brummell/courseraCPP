@@ -6,11 +6,14 @@
 #include <random>
 #include <vector>
 #include <unordered_map>
-#include <set>
+//#include <set>
+#include <unordered_set>
 #include <iomanip>
 #include <string>
 #include <iostream>
 #include <cmath>
+
+
 
 using namespace std;
 
@@ -19,32 +22,31 @@ struct edge {
     double weight;
 };
 
-inline bool operator<(const edge&lhs, const edge&rhs) {
+inline bool operator<(const edge &lhs, const edge &rhs) {
     return lhs.vertex < rhs.vertex;
 }
 
+//template <typename T>
 struct vertex {
     // maybe should be unordered_map
-    set<edge> edges;
+    // possible implement a conversion to int type, possible through name map, to pass vertex more easily to functions
+//    T name;
+    unordered_set<edge> edges;
 };
 
 //    struct path {};
-class graph {
+//template <typename T> THIS IS HERE TO ALLOW NODES TO HAVE REFERENCABLE NAMES
+class Graph {
     // undirected acyclic graph, strictly positive weights (0==no edge)
     // adjacency list representation for now... binary heap allows faster Dykstra's
     // WILL CREATE DIFFERENT  STRUCTS ETC DEPENDING ON CONSTRUCTION (DENSITY, DIRECTEDNESS, ETC)
-    private:
-        vector<vertex> vertices;
-        double target_density;
-        int size;
-        // Random seed
-        random_device rand;
+
 
     public:
         // constructors
 
         // create random graph TODO: make sure connected?
-        graph(double target_density = .20, int size = 100): target_density(target_density), size(size), vertices(size)  {
+        Graph(double target_density = .20, int size = 100) : target_density(target_density), size(size), vertices(size) {
             // Initialize Mersenne Twister pseudo-random number generator
             mt19937 gen(rand());
 
@@ -59,6 +61,8 @@ class graph {
 
             // Generate connections
             for (int i{0}; i <= necessary_edges; ++i) {
+                vertex_map[i] = i;
+
                 int vertex_a = edge_dist(gen);
                 int vertex_b = edge_dist(gen);
                 double weight = weight_dist(gen);
@@ -69,8 +73,37 @@ class graph {
                 vertices[vertex_a].edges.insert(edge_a_b);
                 vertices[vertex_b].edges.insert(edge_b_a);
             }
-
         }
+
+        // lists all nodes y such that there is an edge from x to y.
+        // implement overload to accept vertex type?
+        auto neighbors(int vert_id) {
+            return vertices[vert_id].edges ;
+        }
+
+//        void add_edge(int a, int b, auto weight) {
+//            // for now assume the edge will not already exist, later -> if (adjacent(a, b)) {};
+//            edge edge_a_b{b, weight};
+//            vertices[a].edges.insert(edge_a_b);
+//
+//            edge edge_b_a{a, weight};
+//            vertices[b].edges.insert(edge_b_a);
+//        };
+
+//        bool adjacent(int a, int b) {
+//            bool are_adjacent{false};
+//            int v_a = vertex_map[a], v_b = vertex_map[b];
+//            for (const edge &edge : vertices[a].edges) {
+//                if (edge.vertex == b) are_adjacent = true;
+//            };
+//            return are_adjacent;
+//        };
+
+//        //Getters and Setters
+//        double getx() const { return this->x; } //Add const
+//        double gety() const { return this->y; }
+//
+//        void setx(double v) { x = v; }
 
         auto get_vertices() const {
             return vertices;
@@ -80,14 +113,44 @@ class graph {
             return vertices.size();
         }
 
+        auto shortest_path(Graph& g, int source, int dest) {
+        // for now, will just use indices... convert for nodes later.
+            // assert source and destination are in set
+            unordered_set<int> VminX, X, V;
+            vector<auto> A(size), B(size);
+
+            dijkstra_greedy_crit = [](edge e) { };
+            for (int i = 0; i < size; ++i) {
+                V.insert(i);
+                VminX.insert(i);
+            }
+            A[source] = 0.;
+
+            while (VminX != X) {
+
+            }
+        }
+//        vertices(List): list of vertices in G(V,E).
+//        path(u, w): find shortest path between u-w and returns the sequence of vertices representing shorest path u-v1-v2-…-vn-w.
+//        path_size(u, w): return the path cost associated with the shortest path.
+
+
+        private:
+            vector<vertex> vertices;
+            unordered_map<int, int> vertex_map;
+            double target_density;
+            int size; // TODO: change name
+            // Random seed
+            random_device rand;
+
 
 };
 
-ostream& operator<<(ostream& os, const graph& graph) {
+ostream &operator<<(ostream &os, const Graph &graph) {
     auto g = graph.get_vertices();
-    for (int i{0}; i<g.size(); ++i) {
+    for (int i{0}; i < g.size(); ++i) {
         os << i << " -> ";
-        for (auto& edge : g[i].edges) {
+        for (auto &edge : g[i].edges) {
             os << "{" << edge.vertex << ", " << edge.weight << "}, ";
         }
         os << endl;
@@ -96,36 +159,7 @@ ostream& operator<<(ostream& os, const graph& graph) {
 }
 
 
-//        void add_edge(int a, int b, auto weight) {
-//            if (adjacent(a, b)) {
-//
-//            };
-//            for (const auto &edge : this->vertices[b]) {
-//                if (graph::get_weight(a,b) != 0 ) {
-//                    ;
-//                };
-//            };
-//        };
-//
-//        void set_edge_weight(vertex a, vertex b) {
-//            for (const auto &edge : this->vertices[b]) {
-//
-//            };
-//
-//        };
-//
-//        bool adjacent(vertex a, vertex b) {
-//            bool are_adjacent {false};
-//            for (const edge &edge : this->vertices[a]) {
-//                if (edge.node == b) are_adjacent = true;
-//            };
-//            return are_adjacent;
-//        };
-//
-//    //Getters and Setters
-//    double getx() const{return this->x;} //Add const
-//    double gety() const{return this->y;}
-//    void setx(double v){x = v;}
+
 //V (G): returns the number of vertices in the graph
 //E (G): returns the number of edges in the graph
 //adjacent (G, x, y): tests whether there is an edge from node x to node y.
@@ -150,20 +184,14 @@ ostream& operator<<(ostream& os, const graph& graph) {
 //Compute for a set of randomly generated graphs an average shortest path.
 
 
-//template <typename T>
-//inline T sum(const vector<T>& numeric) {`
-//    T accum = 0;
-//    for (const auto& i : numeric) {
-//        accum += i;
-//    }
-//    return accum;
-//}
-
 
 int main() {
-    graph g{};
+    Graph g{};
     cout << setprecision(5);
-    cout << g << endl;
-
+//    cout << g << endl;
+    cout << g.neighbors(4).size() << endl;
+    cout << g.neighbors(93).size() << endl;
+    cout << g.neighbors(23).size() << endl;
+    cout << g.neighbors(10).size() << endl;
     return 0;
 }
