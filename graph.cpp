@@ -88,40 +88,54 @@ class Graph {
             return graph.size();
         }
 
+        auto shortest_path(Graph& g, int source, int dest) {
+        // for now, will just use indices... convert for nodes later.
+            // assert source and destination are in set
+            unordered_set<int> VminX, X, V;
+            vector<auto> A(size);
+            vector<auto> B(size); //TODO: something sorted
+            auto dijkstra_greedy_crit = [](Edge e) {
+                auto min{100000};
+                auto v_star, w_star;
+                for (auto const& x : X) {
+                    for (auto const& edge : graph[x].edges) { //TODO: not gonna work
+                        if (VminX.count(edge.vertex)) {
+                            auto cost = A[x] + edge.weight;
+                            if (cost <= min) min = cost;
+                        }
+                    }
+                }
+                return pair<min,
+            };
+
+            for (int i = 0; i < size; ++i) {
+                V.insert(i);
+                VminX.insert(i);
+            }
+
+            // base case / init
+            A[source] = 0.;
+            X.insert(source);
+            VminX.erase(VminX.find(source));
+            B[source].push_back(vector<int>{source});
+
+            while (X != V) {
+                // generate frontier set
+                set<auto> F{};
+                for (auto const &vert : X) {
+                    for (auto const &edge : graph[source].edges) {
+                        if (VminX.find(edge.vertex)) {
+                            F.insert(pair<int, Edge>{vert, edge});
+                        }
+                    }
+                }
+                auto iter_result = dijkstra_greedy_crit(F);
+
+            }
+        }
 
 
-//        auto shortest_path(Graph& g, int source, int dest) {
-//        // for now, will just use indices... convert for nodes later.
-//            // assert source and destination are in set
-//            unordered_set<int> VminX, X, V;
-//            vector<auto> A(size);
-//            vector<auto> B(size); //TODO: something sorted
-//            auto dijkstra_greedy_crit = [](Edge e) {
-//                auto min{100000};
-//                auto v_star, w_star;
-//                for (auto const& x : X) {
-//                    for (auto const& edge : graph[x].edges) { //TODO: not gonna work
-//                        if (VminX.count(edge.vertex)) {
-//                            auto cost = A[x] + edge.weight;
-//                            if (cost <= min) min = cost;
-//                        }
-//                    }
-//                }
-//                return pair<min,
-//            };
-//
-//            for (int i = 0; i < size; ++i) {
-//                V.insert(i);
-//                VminX.insert(i);
-//            }
-//
-//            A[source] = 0.;
-//            VminX.
-////            B[source] = structPath
-//            while (X != V) {
-//
-//            }
-//        }
+
 //        vertices(List): list of vertices in G(V,E).
 //        path(u, w): find shortest path between u-w and returns the sequence of vertices representing shorest path u-v1-v2-…-vn-w.
 //        path_size(u, w): return the path cost associated with the shortest path.
