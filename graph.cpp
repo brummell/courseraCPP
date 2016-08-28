@@ -17,63 +17,42 @@
 
 using namespace std;
 
+struct Edge {
+    int vertex;
+    double weight; // comparable, for sake of < op for set insertion
+};
+
+inline bool operator<(const Edge &lhs, const Edge &rhs) {
+    return lhs.weight < rhs.weight;
+}
+
+struct Vertex {
+    // possible implement a conversion to int type, possible through name map, to pass vertex more easily to functions
+    set<Edge> edges; // TODO: should be unordered, once reasonable has defined
+};
 
 
 
-
-
-
-//    struct path {};
-template <typename W, typename N>
 class Graph {
     // undirected acyclic graph, strictly positive weights (0==no edge)
     // adjacency list representation for now... binary heap allows faster Dykstra's
+    // dumb index version, should use other branch in git with pointer one some day... getter/setters to abstract over both
     // WILL CREATE DIFFERENT  STRUCTS ETC DEPENDING ON CONSTRUCTION (DENSITY, DIRECTEDNESS, ETC)
     // TODO: Add DAG, UAG, DCG, UCG options, unweighted as well
     // TODO: add iterator?
-    private:
-        struct Edge;
-        struct Vertex {
-            // possible implement a conversion to int type, possible through name map, to pass vertex more easily to functions
-            N name;
-            set<Edge> edges; // TODO: should be unordered, once reasonable has defined
-        };
-
-        struct Edge {
-            const Vertex* vertex;
-            W weight; // comparable, for sake of < op for set insertion
-
-            friend inline bool operator<(const Edge &lhs, const Edge &rhs) {
-                return lhs.weight < rhs.weight;
-            }
-
-        };
-
-        vector<Vertex> graph;
-        unordered_map<int, int> vertex_map;
-        double target_density;
-        unsigned size; // TODO: change name
-        // Random seed
-        random_device rand;
-
-
     public:
         // constructors
 
         // create random graph TODO: make sure connected?
         Graph(double target_density = .80, unsigned size = 10) : target_density(target_density), size(size), graph() {
             for (int i = 0; i < size; ++i) {
-                Vertex v{i, set<Edge>()};
-                graph.push_back(v);
+                graph.push_back(Vertex{});
                 cout << graph.size() << endl;
             }
-            for (auto v : graph) cout << v.name << endl;
 
-            // Initialize Mersenne Twister pseudo-random number generator
+            // Init Mersenne Twister PRNG
             mt19937 gen(rand());
 
-            // Generate pseudo-random numbers
-            // uniformly distributed in range (start, end)
             uniform_int_distribution<> edge_dstr(0, size - 1);
             uniform_real_distribution<> weight_dstr(0.00001, 1.);
 
@@ -83,19 +62,15 @@ class Graph {
 
             // Generate connections
             for (int i{0}; i <= necessary_edges; ++i) {
-                vertex_map[i] = i;
+                int vertex_a = edge_dstr(gen);
+                int vertex_b = edge_dstr(gen);
+                double weight = weight_dstr(gen);
 
-                auto &vertex_a = graph[edge_dstr(gen)];
-                auto &vertex_b = graph[edge_dstr(gen)];
-                auto weight = weight_dstr(gen);
+                Edge edge_a_b{vertex_b, weight};
+                Edge edge_b_a{vertex_a, weight};
 
-                Edge edge_a_b{&vertex_b, weight};
-                Edge edge_b_a{&vertex_a, weight};
-
-                vertex_a.edges.insert(edge_a_b);
-                vertex_b.edges.insert(edge_b_a);
-
-
+                graph[vertex_a].edges.insert(edge_a_b);
+                graph[vertex_b].edges.insert(edge_b_a);
             }
         }
 
@@ -113,54 +88,50 @@ class Graph {
             return graph.size();
         }
 
-        friend ostream &operator<<(ostream &os, const Graph &graph) {
-            auto g = graph.get_vertices();
-            for (int i{0}; i < g.size(); ++i) {
-                os << i << " -> ";
-                for (auto &edge : g[i].edges) {
-                    os << "{" << edge.vertex->name << ", " << edge.weight << "}, ";
-                }
-                os << endl;
-            }
-            return os;
-        }
 
-        auto shortest_path(Graph& g, int source, int dest) {
-        // for now, will just use indices... convert for nodes later.
-            // assert source and destination are in set
-            unordered_set<int> VminX, X, V;
-            vector<auto> A(size);
-            vector<auto> B(size); //TODO: something sorted
-            auto dijkstra_greedy_crit = [](Edge e) {
-                auto min{100000};
-                auto v_star, w_star;
-                for (auto const& x : X) {
-                    for (auto const& edge : graph[x].edges) { //TODO: not gonna work
-                        if (VminX.count(edge.vertex)) {
-                            auto cost = A[x] + edge.weight;
-                            if (cost <= min) min = cost;
-                        }
-                    }
-                }
-                return pair<min,
-            };
 
-            for (int i = 0; i < size; ++i) {
-                V.insert(i);
-                VminX.insert(i);
-            }
-
-            A[source] = 0.;
-            VminX.
-//            B[source] = structPath
-            while (X != V) {
-
-            }
-        }
+//        auto shortest_path(Graph& g, int source, int dest) {
+//        // for now, will just use indices... convert for nodes later.
+//            // assert source and destination are in set
+//            unordered_set<int> VminX, X, V;
+//            vector<auto> A(size);
+//            vector<auto> B(size); //TODO: something sorted
+//            auto dijkstra_greedy_crit = [](Edge e) {
+//                auto min{100000};
+//                auto v_star, w_star;
+//                for (auto const& x : X) {
+//                    for (auto const& edge : graph[x].edges) { //TODO: not gonna work
+//                        if (VminX.count(edge.vertex)) {
+//                            auto cost = A[x] + edge.weight;
+//                            if (cost <= min) min = cost;
+//                        }
+//                    }
+//                }
+//                return pair<min,
+//            };
+//
+//            for (int i = 0; i < size; ++i) {
+//                V.insert(i);
+//                VminX.insert(i);
+//            }
+//
+//            A[source] = 0.;
+//            VminX.
+////            B[source] = structPath
+//            while (X != V) {
+//
+//            }
+//        }
 //        vertices(List): list of vertices in G(V,E).
 //        path(u, w): find shortest path between u-w and returns the sequence of vertices representing shorest path u-v1-v2-…-vn-w.
 //        path_size(u, w): return the path cost associated with the shortest path.
-
+    private:
+        vector<Vertex> graph;
+        unordered_map<int, int> vertex_map;
+        double target_density;
+        unsigned size; // TODO: change name
+        // Random seed
+        random_device rand;
 
 
 
@@ -168,7 +139,17 @@ class Graph {
 
 
 
-
+ostream &operator<<(ostream &os, const Graph &graph) {
+    auto g = graph.get_vertices();
+    for (int i{0}; i < g.size(); ++i) {
+        os << i << " -> ";
+        for (auto &edge : g[i].edges) {
+            os << "{" << edge.vertex << ", " << edge.weight << "}, ";
+        }
+        os << endl;
+    }
+    return os;
+}
 
 //V (G): returns the number of vertices in the graph
 //E (G): returns the number of edges in the graph
@@ -196,7 +177,7 @@ class Graph {
 
 
 int main() {
-    Graph<double, int> g{};
+    Graph g{};
     cout << setprecision(5);
     cout << g << endl;
     cout << g.neighbors(4).size() << endl;
