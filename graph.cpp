@@ -17,30 +17,14 @@
 
 using namespace std;
 
-struct Edge;
 
-template <typename T>
-struct Vertex {
-    // maybe should be unordered_map
-    // possible implement a conversion to int type, possible through name map, to pass vertex more easily to functions
-    T name;
-    set<Edge> edges; // TODO: should be unordered, once reasonable has defined
-};
 
-//template <typename T>
-struct Edge {
-    const Vertex* v;
-    T weight; // comparable, for sake of < op for set insertion
-};
 
-inline bool operator<(const Edge &lhs, const Edge &rhs) {
-    return lhs.weight < rhs.weight;
-}
 
 
 
 //    struct path {};
-//template <typename T> THIS IS HERE TO ALLOW NODES TO HAVE REFERENCABLE NAMES
+template <typename W, typename N>
 class Graph {
     // undirected acyclic graph, strictly positive weights (0==no edge)
     // adjacency list representation for now... binary heap allows faster Dykstra's
@@ -48,10 +32,27 @@ class Graph {
     // TODO: Add DAG, UAG, DCG, UCG options, unweighted as well
     // TODO: add iterator?
     private:
+        struct Edge;
+        struct Vertex {
+            // possible implement a conversion to int type, possible through name map, to pass vertex more easily to functions
+            N name;
+            set<Edge> edges; // TODO: should be unordered, once reasonable has defined
+        };
+
+        struct Edge {
+            const Vertex* vertex;
+            W weight; // comparable, for sake of < op for set insertion
+
+            friend inline bool operator<(const Edge &lhs, const Edge &rhs) {
+                return lhs.weight < rhs.weight;
+            }
+
+        };
+
         vector<Vertex> graph;
         unordered_map<int, int> vertex_map;
         double target_density;
-        int size; // TODO: change name
+        unsigned size; // TODO: change name
         // Random seed
         random_device rand;
 
@@ -60,10 +61,9 @@ class Graph {
         // constructors
 
         // create random graph TODO: make sure connected?
-        Graph(double target_density = .80, int size = 10) : target_density(target_density), size(size), graph() {
+        Graph(double target_density = .80, unsigned size = 10) : target_density(target_density), size(size), graph() {
             for (int i = 0; i < size; ++i) {
-                Edge<double> e{};
-                Vertex<int> v{i, set<Edge<double>>()};
+                Vertex v{i, set<Edge>()};
                 graph.push_back(v);
                 cout << graph.size() << endl;
             }
@@ -113,37 +113,50 @@ class Graph {
             return graph.size();
         }
 
-//        auto shortest_path(Graph& g, int source, int dest) {
-//        // for now, will just use indices... convert for nodes later.
-//            // assert source and destination are in set
-//            unordered_set<int> VminX, X, V;
-//            vector<auto> A(size);
-//            vector<auto> B(size); //TODO: something sorted
-//            auto dijkstra_greedy_crit = [](edge e) {
-//                auto min{100000};
-//                auto v_star, w_star;
-//                for (auto const& x : X) {
-//                    for (auto const& edge : vertices[x].edges) { //TODO: not gonna work
-//                        if (VminX.count(edge.vertex)) {
-//                            auto cost = A[x] + edge.weight;
-//                            if (cost <= min) min = cost;
-//                        }
-//                    }
-//                }
-//                return pair<min,
-//            };
-//
-//            for (int i = 0; i < size; ++i) {
-//                V.insert(i);
-//                VminX.insert(i);
-//            }
-//
-//            A[source] = 0.;
-////            B[source] = structPath
-//            while (X != V) {
-//
-//            }
-//        }
+        friend ostream &operator<<(ostream &os, const Graph &graph) {
+            auto g = graph.get_vertices();
+            for (int i{0}; i < g.size(); ++i) {
+                os << i << " -> ";
+                for (auto &edge : g[i].edges) {
+                    os << "{" << edge.vertex->name << ", " << edge.weight << "}, ";
+                }
+                os << endl;
+            }
+            return os;
+        }
+
+        auto shortest_path(Graph& g, int source, int dest) {
+        // for now, will just use indices... convert for nodes later.
+            // assert source and destination are in set
+            unordered_set<int> VminX, X, V;
+            vector<auto> A(size);
+            vector<auto> B(size); //TODO: something sorted
+            auto dijkstra_greedy_crit = [](Edge e) {
+                auto min{100000};
+                auto v_star, w_star;
+                for (auto const& x : X) {
+                    for (auto const& edge : graph[x].edges) { //TODO: not gonna work
+                        if (VminX.count(edge.vertex)) {
+                            auto cost = A[x] + edge.weight;
+                            if (cost <= min) min = cost;
+                        }
+                    }
+                }
+                return pair<min,
+            };
+
+            for (int i = 0; i < size; ++i) {
+                V.insert(i);
+                VminX.insert(i);
+            }
+
+            A[source] = 0.;
+            VminX.
+//            B[source] = structPath
+            while (X != V) {
+
+            }
+        }
 //        vertices(List): list of vertices in G(V,E).
 //        path(u, w): find shortest path between u-w and returns the sequence of vertices representing shorest path u-v1-v2-…-vn-w.
 //        path_size(u, w): return the path cost associated with the shortest path.
@@ -153,17 +166,7 @@ class Graph {
 
 };
 
-ostream &operator<<(ostream &os, const Graph &graph) {
-    auto g = graph.get_vertices();
-    for (int i{0}; i < g.size(); ++i) {
-        os << i << " -> ";
-        for (auto &edge : g[i].edges) {
-            os << "{" << edge.v->name << ", " << edge.weight << "}, ";
-        }
-        os << endl;
-    }
-    return os;
-}
+
 
 
 
@@ -193,7 +196,7 @@ ostream &operator<<(ostream &os, const Graph &graph) {
 
 
 int main() {
-    Graph g{};
+    Graph<double, int> g{};
     cout << setprecision(5);
     cout << g << endl;
     cout << g.neighbors(4).size() << endl;
