@@ -11,7 +11,7 @@
 #include <algorithm>
 
 template <typename Collection,typename unop>
-Collection U(Collection col, unop op){
+Collection and(Collection col1, Collection col2, unop op){
     // set union
     std::for_each(col.begin(),col.end(),op);
 }
