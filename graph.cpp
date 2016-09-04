@@ -7,6 +7,7 @@
 #include <vector>
 #include <unordered_map>
 #include <set>
+#include <cassert>
 #include <unordered_set>
 #include <iomanip>
 #include <string>
@@ -26,8 +27,10 @@ inline bool operator<(const Edge &lhs, const Edge &rhs) {
     return lhs.weight < rhs.weight;
 }
 
+//template <typename T>
 struct Vertex {
     // possible implement a conversion to int type, possible through name map, to pass vertex more easily to functions
+//    T value;
     set<Edge> edges; // TODO: should be unordered, once reasonable has defined
 };
 
@@ -45,10 +48,7 @@ class Graph {
 
         // create random graph TODO: make sure connected?
         Graph(double target_density = .80, unsigned size = 10) : target_density(target_density), size(size), graph() {
-            for (int i = 0; i < size; ++i) {
-                graph.push_back(Vertex{});
-                cout << graph.size() << endl;
-            }
+            for (int i = 0; i < size; ++i) { graph.push_back(Vertex<int>{0}); }
 
             // Init Mersenne Twister PRNG
             mt19937 gen(rand());
@@ -60,79 +60,112 @@ class Graph {
             int max_possible_edges = (size * (size - 1)) / 2;
             int necessary_edges = floor(max_possible_edges * target_density);
 
-            // Generate connections
+            // Generate connections TODO: produces slightly off count due to self connections
             for (int i{0}; i <= necessary_edges; ++i) {
                 int vertex_a = edge_dstr(gen);
                 int vertex_b = edge_dstr(gen);
-                double weight = weight_dstr(gen);
 
-                Edge edge_a_b{vertex_b, weight};
-                Edge edge_b_a{vertex_a, weight};
+                if (vertex_a != vertex_b) {
+                    double weight = weight_dstr(gen);
 
-                graph[vertex_a].edges.insert(edge_a_b);
-                graph[vertex_b].edges.insert(edge_b_a);
+                    Edge edge_a_b{vertex_b, weight};
+                    Edge edge_b_a{vertex_a, weight};
+
+                    graph[vertex_a].edges.insert(edge_a_b);
+                    graph[vertex_b].edges.insert(edge_b_a);
+                }
             }
         }
 
-        // lists all nodes y such that there is an edge from x to y.
-        // implement overload to accept vertex type?
         auto neighbors(int vert_id) {
+        // lists all nodes y such that there is an edge from x to y. implement overload to accept vertex type?
             return graph[vert_id].edges ;
         }
+
+//        auto edge_density(int vert_id) {
+//            // return density of out edges
+//            // TODO: implement
+//        }
 
         auto get_vertices() const {
             return graph;
         }
 
-        inline auto vertices_count_temp() {
+        inline auto vertex_count() {
+        // returns the number of vertices in the graph
             return graph.size();
         }
 
-        auto shortest_path(Graph& g, int source, int dest) {
-        // for now, will just use indices... convert for nodes later.
-            // assert source and destination are in set
-            unordered_set<int> VminX, X, V;
-            vector<auto> A(size);
-            vector<auto> B(size); //TODO: something sorted
-            auto dijkstra_greedy_crit = [](Edge e) {
-                auto min{100000};
-                auto v_star, w_star;
-                for (auto const& x : X) {
-                    for (auto const& edge : graph[x].edges) { //TODO: not gonna work
-                        if (VminX.count(edge.vertex)) {
-                            auto cost = A[x] + edge.weight;
-                            if (cost <= min) min = cost;
-                        }
-                    }
-                }
-                return pair<min,
-            };
-
-            for (int i = 0; i < size; ++i) {
-                V.insert(i);
-                VminX.insert(i);
-            }
-
-            // base case / init
-            A[source] = 0.;
-            X.insert(source);
-            VminX.erase(VminX.find(source));
-            B[source].push_back(vector<int>{source});
-
-            while (X != V) {
-                // generate frontier set
-                set<auto> F{};
-                for (auto const &vert : X) {
-                    for (auto const &edge : graph[source].edges) {
-                        if (VminX.find(edge.vertex)) {
-                            F.insert(pair<int, Edge>{vert, edge});
-                        }
-                    }
-                }
-                auto iter_result = dijkstra_greedy_crit(F);
-
-            }
+        inline auto edge_count() {
+        // returns the number of edges in the graph
+            int count{0};
+            for (const auto vertex : graph) { count += vertex.edges.size(); }
+            assert(count % 2 == 0); // uDAG should have even edge cardinality
+            return count / 2;
         }
+
+        //adjacent (G, x, y): tests whether there is an edge from node x to node y.
+        //neighbors (G, x): lists all nodes y such that there is an edge from x to y.
+        //add (G, x, y): adds to G the edge from x to y, if it is not there.
+        //delete (G, x, y): removes the edge from x to y, if it is there.
+        //get_node_value (G, x): returns the value associated with the node x.
+        //set_node_value( G, x, a): sets the value associated with the node x to a.
+        //get_edge_value( G, x, y): returns the value associated to the edge (x,y).
+        //set_edge_value (G, x, y, v): sets the value associated to the edge (x,y) to v.
+
+        // One important consideration for the Graph class is how to represent the graph as a member ADT.
+        //  Two basic implementations are generally considered: adjacency list and adjacency matrix depending on
+        //  the relative edge density. For sparse graphs, the list approach is typically more efficient, but for
+        //  dense graphs, the matrix approach can be more efficient (reference an Algorithm’s source for space
+        //  and time analysis). Note in some cases such as add(G, x, y) you may also want to have the edge carry
+        //  along its cost. Another approach could be to use (x, y) to index a cost stored in an associated
+        //  array or map.
+
+//        auto shortest_path(Graph& g, int source, int dest) {
+//        // for now, will just use indices... convert for nodes later.
+//            // assert source and destination are in set
+//            unordered_set<int> VminX, X, V;
+//            vector<auto> A(size);
+//            vector<auto> B(size); //TODO: something sorted
+//            auto dijkstra_greedy_crit = [](Edge e) {
+//                auto min{100000};
+//                auto v_star, w_star;
+//                for (auto const& x : X) {
+//                    for (auto const& edge : graph[x].edges) { //TODO: not gonna work
+//                        if (VminX.count(edge.vertex)) {
+//                            auto cost = A[x] + edge.weight;
+//                            if (cost <= min) min = cost;
+//                        }
+//                    }
+//                }
+//                return pair<min,
+//            };
+//
+//            for (int i = 0; i < size; ++i) {
+//                V.insert(i);
+//                VminX.insert(i);
+//            }
+//
+//            // base case / init
+//            A[source] = 0.;
+//            X.insert(source);
+//            VminX.erase(VminX.find(source));
+//            B[source].push_back(vector<int>{source});
+//
+//            while (X != V) {
+//                // generate frontier set
+//                set<auto> F{};
+//                for (auto const &vert : X) {
+//                    for (auto const &edge : graph[source].edges) {
+//                        if (VminX.find(edge.vertex)) {
+//                            F.insert(pair<int, Edge>{vert, edge});
+//                        }
+//                    }
+//                }
+//                auto iter_result = dijkstra_greedy_crit(F);
+//
+//            }
+//        }
 
 
 
@@ -143,7 +176,7 @@ class Graph {
         vector<Vertex> graph;
         unordered_map<int, int> vertex_map;
         double target_density;
-        unsigned size; // TODO: change name
+        int size; // TODO: change name
         // Random seed
         random_device rand;
 
@@ -165,17 +198,7 @@ ostream &operator<<(ostream &os, const Graph &graph) {
     return os;
 }
 
-//V (G): returns the number of vertices in the graph
-//E (G): returns the number of edges in the graph
-//adjacent (G, x, y): tests whether there is an edge from node x to node y.
-//neighbors (G, x): lists all nodes y such that there is an edge from x to y.
-//add (G, x, y): adds to G the edge from x to y, if it is not there.
-//delete (G, x, y): removes the edge from x to y, if it is there.
-//get_node_value (G, x): returns the value associated with the node x.
-//set_node_value( G, x, a): sets the value associated with the node x to a.
-//get_edge_value( G, x, y): returns the value associated to the edge (x,y).
-//set_edge_value (G, x, y, v): sets the value associated to the edge (x,y) to v.
-//One important consideration for the Graph class is how to represent the graph as a member ADT. Two basic implementations are generally considered: adjacency list and adjacency matrix depending on the relative edge density. For sparse graphs, the list approach is typically more efficient, but for dense graphs, the matrix approach can be more efficient (reference an Algorithm’s source for space and time analysis). Note in some cases such as add(G, x, y) you may also want to have the edge carry along its cost. Another approach could be to use (x, y) to index a cost stored in an associated array or map.
+
 
 //Notes and Reminders:
 //
@@ -194,9 +217,8 @@ int main() {
     Graph g{};
     cout << setprecision(5);
     cout << g << endl;
-    cout << g.neighbors(4).size() << endl;
-    cout << g.neighbors(93).size() << endl;
-    cout << g.neighbors(23).size() << endl;
-    cout << g.neighbors(10).size() << endl;
+//    cout << g.neighbors(93).size() << endl;
+    cout << g.vertex_count() << endl;
+    cout << g.edge_count() << endl;
     return 0;
 }
