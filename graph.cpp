@@ -15,7 +15,6 @@
 #include <cmath>
 
 
-
 using namespace std;
 
 //struct Edge {
@@ -26,13 +25,12 @@ using namespace std;
 //    return lhs.weight < rhs.weight;
 //}
 
+
 struct Vertex {
     // possible implement a conversion to int type, possible through name map, to pass vertex more easily to functions
     int id;
     unordered_map<int, double> edges; // TODO: should be unordered, once reasonable has defined
 };
-
-
 
 class Graph {
     // undirected acyclic graph, strictly positive weights (0==no edge)
@@ -52,27 +50,22 @@ class Graph {
 
     public:
         // constructors
-
         // create random graph TODO: make sure connected?
-        Graph(double target_density = .80, pair<int, int> edge_range = {0,1}, int size = 10) : target_density(target_density), edge_range(edge_range), size(size), graph() {
+        Graph(double target_density = .80, pair<int, int> edge_range = {0, 1}, int size = 10) : target_density(
+                target_density), edge_range(edge_range), size(size), graph() {
             for (int i = 0; i < size; ++i) { graph.push_back(Vertex{}); }
-
             // Init Mersenne Twister PRNG
             mt19937 gen(rand());
-
             uniform_int_distribution<> edge_dstr(0, size - 1);
             uniform_real_distribution<> weight_dstr(0.00001, 1.);
-
             // this may actually produce fewer that required, but at reasonable sizes/densities, should be close enough for a homework
             int max_possible_edges = (size * (size - 1)) / 2;
             int necessary_edges = floor(max_possible_edges * target_density);
-
             // Generate connections TODO: produces slightly off count due to self connections
             int edge_count{0};
             while (edge_count <= necessary_edges) {
                 int vertex_a = edge_dstr(gen);
                 int vertex_b = edge_dstr(gen);
-
                 if (vertex_a != vertex_b and not graph[vertex_a].edges.count(vertex_b)) {
                     double weight = weight_dstr(gen);
                     graph[vertex_a].edges[vertex_b] = weight;
@@ -83,26 +76,26 @@ class Graph {
         }
 
         auto neighbors(int vert_id) {
-        // lists all nodes y such that there is an edge from x to y. implement overload to accept vertex type?
-            return graph[vert_id].edges ;
+            // lists all nodes y such that there is an edge from x to y. implement overload to accept vertex type?
+            return graph[vert_id].edges;
         };
 
-//        auto edge_density(int vert_id) {
-//            // return density of out edges
-//            // TODO: implement
-//        }
+        auto edge_density(int vert_id) {
+            // return density of out edges
+            // TODO: implement
+        }
 
         auto get_vertices() const {
             return graph;
         };
 
         inline auto vertex_count() {
-        // returns the number of vertices in the graph
+            // returns the number of vertices in the graph
             return graph.size();
         };
 
         inline auto edge_count() {
-        // returns the number of edges in the graph
+            // returns the number of edges in the graph
             int count{0};
             for (const auto vertex : graph) {
                 count += vertex.edges.size();
@@ -111,81 +104,62 @@ class Graph {
             return count / 2;
         };
 
-        inline auto are_adjacent(Vertex x, Vertex y) {
-        // test whether there is an edge from node x to node y.s
-        };
+        auto shortest_path_calc(int source);
 
+        inline auto are_adjacent(Vertex x, Vertex y) {
+            // test whether there is an edge from node x to node y.s
+        };
         //add (G, x, y): adds to G the edge from x to y, if it is not there.
         //delete (G, x, y): removes the edge from x to y, if it is there.
         //get_node_value (G, x): returns the value associated with the node x.
         //set_node_value( G, x, a): sets the value associated with the node x to a.
         //get_edge_value( G, x, y): returns the value associated to the edge (x,y).
         //set_edge_value (G, x, y, v): sets the value associated to the edge (x,y) to v.
-
         // One important consideration for the Graph class is how to represent the graph as a member ADT.
         //  Two basic implementations are generally considered: adjacency list and adjacency matrix depending on
         //  the relative edge density. For sparse graphs, the list approach is typically more efficient, but for
         //  dense graphs, the matrix approach can be more efficient (reference an Algorithm’s source for space
         //  and time analysis). Note in some cases such as add(G, x, y) you may also want to have the edge carry
         //  along its cost. Another approach could be to use (x, y) to index a cost stored in an associated
-        //  array or map.
+        //  array or map
+};
 
-
-    //            auto dijkstra_greedy_crit = [](Edge e) {
-//                auto min{100000};
-//                auto v_star, w_star;
-//                for (auto const& x : X) {
-//                    for (auto const& edge : graph[x].edges) { //TODO: not gonna work
-//                        if (VminX.count(edge.vertex)) {
-//                            auto cost = A[x] + edge.weight;
-//                            if (cost <= min) min = cost;
-//                        }
-//                    }
-//                }
-//                return pair<min,
-//            };
-
-
-        auto shortest_path_calc(int source) {
-        // for now, will just use indices... convert for nodes later.
-            // assert source and destination are in set
-            unordered_set<int> VminX, X, V;
-            vector<double> A(size);
-            vector<vector<int>> B(size); //TODO: something sorted
-
-
-            for (int i = 0; i < size; ++i) {
-                V.insert(i);
-                VminX.insert(i);
-            }
-
-            cout << "here_0" << endl;
-
-            // base case / init
-            A[source] = 0.;
-            X.insert(source);
-
-            VminX.erase(VminX.find(source));
-            B[source].push_back(source);
-            while (X != V) {
-                // generate frontier set
-                set<int> F{};
-                for (auto const &vert : X) {
-                    for (auto const &edge : graph[source].edges) {
-                        if (VminX.count(edge.first) != 0) {
-                            F.insert(edge.first);
-                        }
-                    }
+auto Graph::shortest_path_calc(int source) {
+    // for now, will just use indices... convert for nodes later.
+    // assert source and destination are in set
+    unordered_set<int> VminX, X, V;
+    vector<double> A(size);
+    vector<vector<int>> B(size); //TODO: something sorted
+    for (int i = 0; i < size; ++i) {
+        V.insert(i);
+        VminX.insert(i);
+    }
+    cout << "here_0" << endl;
+    // base case / init
+    A[source] = 0.;
+    X.insert(source);
+    VminX.erase(VminX.find(source));
+    B[source].push_back(source);
+    while (X != V) {
+        // generate frontier set
+        set<int> F{};
+        for (auto const &vert : X) {
+            for (auto const &edge : graph[source].edges) {
+                if (VminX.count(edge.first) != 0) {
+                    F.insert(edge.first);
                 }
-
-                for (auto const &x : F) {
-                    cout << x << endl;
-
-                }
-                break;
-//                auto iter_result = dijkstra_greedy_crit(F);
             }
-        };
+        }
+        for (auto const &x : F) {
+            cout << x << endl;
+        }
+        break;
+//        auto iter_result = dijkstra_greedy_crit(F);
+    }
+};
+
+
+
 
 //        auto shortest_path(int source, int sink) {;}
 
@@ -195,11 +169,6 @@ class Graph {
 //        vertices(List): list of vertices in G(V,E).
 //        path(u, w): find shortest path between u-w and returns the sequence of vertices representing shorest path u-v1-v2-…-vn-w.
 //        path_size(u, w): return the path cost associated with the shortest path.
-
-
-
-
-};
 
 
 
