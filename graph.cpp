@@ -18,20 +18,18 @@
 
 using namespace std;
 
-struct Edge {
-    int vertex;
-    double weight; // comparable, for sake of < op for set insertion
-};
+//struct Edge {
+//    int vertex;
+//    double weight; // comparable, for sake of < op for set insertion
+//};
+//inline bool operator<(const Edge &lhs, const Edge &rhs) {
+//    return lhs.weight < rhs.weight;
+//}
 
-inline bool operator<(const Edge &lhs, const Edge &rhs) {
-    return lhs.weight < rhs.weight;
-}
-
-//template <typename T>
 struct Vertex {
     // possible implement a conversion to int type, possible through name map, to pass vertex more easily to functions
-//    T value;
-    set<Edge> edges; // TODO: should be unordered, once reasonable has defined
+    int id;
+    unordered_map<int, double> edges; // TODO: should be unordered, once reasonable has defined
 };
 
 
@@ -43,12 +41,21 @@ class Graph {
     // WILL CREATE DIFFERENT  STRUCTS ETC DEPENDING ON CONSTRUCTION (DENSITY, DIRECTEDNESS, ETC)
     // TODO: Add DAG, UAG, DCG, UCG options, unweighted as well
     // TODO: add iterator?
+    private:
+        vector<Vertex> graph;
+        unordered_map<int, int> vertex_map;
+        pair<int, int> edge_range;
+        double target_density;
+        int size; // TODO: change name
+        // Random seed
+        random_device rand;
+
     public:
         // constructors
 
         // create random graph TODO: make sure connected?
-        Graph(double target_density = .80, unsigned size = 10) : target_density(target_density), size(size), graph() {
-            for (int i = 0; i < size; ++i) { graph.push_back(Vertex<int>{0}); }
+        Graph(double target_density = .80, pair<int, int> edge_range = {0,1}, int size = 10) : target_density(target_density), edge_range(edge_range), size(size), graph() {
+            for (int i = 0; i < size; ++i) { graph.push_back(Vertex{}); }
 
             // Init Mersenne Twister PRNG
             mt19937 gen(rand());
@@ -61,18 +68,19 @@ class Graph {
             int necessary_edges = floor(max_possible_edges * target_density);
 
             // Generate connections TODO: produces slightly off count due to self connections
-            for (int i{0}; i <= necessary_edges; ++i) {
+            int edge_count{0};
+            while (edge_count <= necessary_edges) {
                 int vertex_a = edge_dstr(gen);
                 int vertex_b = edge_dstr(gen);
+                cout << "something" << endl;
 
-                if (vertex_a != vertex_b) {
+                if (vertex_a != vertex_b and graph[vertex_a].edges.count(vertex_b)) {
+                    cout << "anything" << endl;
                     double weight = weight_dstr(gen);
-
-                    Edge edge_a_b{vertex_b, weight};
-                    Edge edge_b_a{vertex_a, weight};
-
-                    graph[vertex_a].edges.insert(edge_a_b);
-                    graph[vertex_b].edges.insert(edge_b_a);
+                    graph[vertex_a].edges[vertex_b] = weight;
+                    graph[vertex_b].edges[vertex_b] = weight;
+                    edge_count += 1;
+                    cout << edge_count << endl;
                 }
             }
         }
@@ -80,7 +88,7 @@ class Graph {
         auto neighbors(int vert_id) {
         // lists all nodes y such that there is an edge from x to y. implement overload to accept vertex type?
             return graph[vert_id].edges ;
-        }
+        };
 
 //        auto edge_density(int vert_id) {
 //            // return density of out edges
@@ -89,12 +97,12 @@ class Graph {
 
         auto get_vertices() const {
             return graph;
-        }
+        };
 
         inline auto vertex_count() {
         // returns the number of vertices in the graph
             return graph.size();
-        }
+        };
 
         inline auto edge_count() {
         // returns the number of edges in the graph
@@ -102,10 +110,12 @@ class Graph {
             for (const auto vertex : graph) { count += vertex.edges.size(); }
             assert(count % 2 == 0); // uDAG should have even edge cardinality
             return count / 2;
-        }
+        };
 
-        //adjacent (G, x, y): tests whether there is an edge from node x to node y.
-        //neighbors (G, x): lists all nodes y such that there is an edge from x to y.
+        inline auto are_adjacent(Vertex x, Vertex y) {
+        // test whether there is an edge from node x to node y.s
+        };
+
         //add (G, x, y): adds to G the edge from x to y, if it is not there.
         //delete (G, x, y): removes the edge from x to y, if it is there.
         //get_node_value (G, x): returns the value associated with the node x.
@@ -121,13 +131,8 @@ class Graph {
         //  along its cost. Another approach could be to use (x, y) to index a cost stored in an associated
         //  array or map.
 
-//        auto shortest_path(Graph& g, int source, int dest) {
-//        // for now, will just use indices... convert for nodes later.
-//            // assert source and destination are in set
-//            unordered_set<int> VminX, X, V;
-//            vector<auto> A(size);
-//            vector<auto> B(size); //TODO: something sorted
-//            auto dijkstra_greedy_crit = [](Edge e) {
+
+    //            auto dijkstra_greedy_crit = [](Edge e) {
 //                auto min{100000};
 //                auto v_star, w_star;
 //                for (auto const& x : X) {
@@ -140,45 +145,58 @@ class Graph {
 //                }
 //                return pair<min,
 //            };
-//
-//            for (int i = 0; i < size; ++i) {
-//                V.insert(i);
-//                VminX.insert(i);
-//            }
-//
-//            // base case / init
-//            A[source] = 0.;
-//            X.insert(source);
-//            VminX.erase(VminX.find(source));
-//            B[source].push_back(vector<int>{source});
-//
-//            while (X != V) {
-//                // generate frontier set
-//                set<auto> F{};
-//                for (auto const &vert : X) {
-//                    for (auto const &edge : graph[source].edges) {
-//                        if (VminX.find(edge.vertex)) {
-//                            F.insert(pair<int, Edge>{vert, edge});
-//                        }
-//                    }
-//                }
+
+
+        auto shortest_path_calc(int source) {
+        // for now, will just use indices... convert for nodes later.
+            // assert source and destination are in set
+            unordered_set<int> VminX, X, V;
+            vector<double> A(size);
+            vector<vector<int>> B(size); //TODO: something sorted
+
+
+            for (int i = 0; i < size; ++i) {
+                V.insert(i);
+                VminX.insert(i);
+            }
+
+            cout << "here_0" << endl;
+
+            // base case / init
+            A[source] = 0.;
+            X.insert(source);
+
+            VminX.erase(VminX.find(source));
+            B[source].push_back(source);
+            while (X != V) {
+                // generate frontier set
+                set<int> F{};
+                for (auto const &vert : X) {
+                    for (auto const &edge : graph[source].edges) {
+                        if (VminX.count(edge.first) != 0) {
+                            F.insert(edge.first);
+                        }
+                    }
+                }
+
+                for (auto const &x : F) {
+                    cout << x << endl;
+
+                }
+                break;
 //                auto iter_result = dijkstra_greedy_crit(F);
-//
-//            }
-//        }
+            }
+        };
+
+//        auto shortest_path(int source, int sink) {;}
+
 
 
 
 //        vertices(List): list of vertices in G(V,E).
 //        path(u, w): find shortest path between u-w and returns the sequence of vertices representing shorest path u-v1-v2-…-vn-w.
 //        path_size(u, w): return the path cost associated with the shortest path.
-    private:
-        vector<Vertex> graph;
-        unordered_map<int, int> vertex_map;
-        double target_density;
-        int size; // TODO: change name
-        // Random seed
-        random_device rand;
+
 
 
 
@@ -191,7 +209,7 @@ ostream &operator<<(ostream &os, const Graph &graph) {
     for (int i{0}; i < g.size(); ++i) {
         os << i << " -> ";
         for (auto &edge : g[i].edges) {
-            os << "{" << edge.vertex << ", " << edge.weight << "}, ";
+            os << "{" << edge.first << ", " << edge.second << "}, ";
         }
         os << endl;
     }
@@ -220,5 +238,7 @@ int main() {
 //    cout << g.neighbors(93).size() << endl;
     cout << g.vertex_count() << endl;
     cout << g.edge_count() << endl;
+
+    g.shortest_path_calc(0);
     return 0;
 }
