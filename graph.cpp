@@ -72,15 +72,12 @@ class Graph {
             while (edge_count <= necessary_edges) {
                 int vertex_a = edge_dstr(gen);
                 int vertex_b = edge_dstr(gen);
-                cout << "something" << endl;
 
-                if (vertex_a != vertex_b and graph[vertex_a].edges.count(vertex_b)) {
-                    cout << "anything" << endl;
+                if (vertex_a != vertex_b and not graph[vertex_a].edges.count(vertex_b)) {
                     double weight = weight_dstr(gen);
                     graph[vertex_a].edges[vertex_b] = weight;
-                    graph[vertex_b].edges[vertex_b] = weight;
+                    graph[vertex_b].edges[vertex_a] = weight;
                     edge_count += 1;
-                    cout << edge_count << endl;
                 }
             }
         }
@@ -107,7 +104,9 @@ class Graph {
         inline auto edge_count() {
         // returns the number of edges in the graph
             int count{0};
-            for (const auto vertex : graph) { count += vertex.edges.size(); }
+            for (const auto vertex : graph) {
+                count += vertex.edges.size();
+            }
             assert(count % 2 == 0); // uDAG should have even edge cardinality
             return count / 2;
         };
