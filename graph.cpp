@@ -125,6 +125,19 @@ class Graph {
 };
 
 auto Graph::shortest_path_calc(int source) {
+//    auto dijkstra_greedy_crit = [](Edge e) {
+//        auto min{100000};
+//        auto v_star, w_star;
+//        for (auto const& x : X) {
+//            for (auto const& edge : graph[x].edges) { //TODO: not gonna work
+//                if (VminX.count(edge.vertex)) {
+//                    auto cost = A[x] + edge.weight;
+//                    if (cost <= min) min = cost;
+//                }
+//            }
+//        }
+//        return pair<min,
+//                                            };
     // for now, will just use indices... convert for nodes later.
     // assert source and destination are in set
     unordered_set<int> VminX, X, V;
