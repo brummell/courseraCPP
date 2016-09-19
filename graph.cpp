@@ -27,6 +27,7 @@
 #include <iomanip>
 #include <string>
 #include <iostream>
+#include <algorithm>
 #include <cmath>
 
 
@@ -149,6 +150,8 @@ class Graph {
             // THIS COULD BE IMPLEMENTED FROM THE GET GO FOR THE HEAP BY RETURNING THE MIN GREEDY SCORE FOR ALL IT'S EDGES IN X --I THINK, ANYWAY
             // for now, will just use indices... convert for nodes later.
             // assert source and destination are in set
+            using min_edge = pair<pair<int, int>, double>;
+
             unordered_set<int> VminX, X, V;
             vector<double> A(size);
             vector<vector<int>> B(size); //TODO: something sorted
@@ -165,14 +168,6 @@ class Graph {
                 B[w_star].push_back(w_star);
             };
 
-            // initialize path records and sets for source; seems you can call it with v* and w* both being the source
-            //   but the current implementation requires the graph implement to know dist(a, a) = 0... which it currently
-            //   does not... also, can empty vector manipulations are not well-understood by a doug at this point... HASKELL!!!!!
-            //            A[source] = 0.;
-            //            X.insert(source);
-            //            VminX.erase(VminX.find(source));
-            //            B[source].push_back(source);
-
             auto greedy_criterion_vert = [&](int vert_index) {
                 // takes vertices from XminV and returns min dijsktra greedy score
                 double min{10000000000.}, cost{};
@@ -188,25 +183,35 @@ class Graph {
                     }
                 }
 
-                pair<pair<int, int>, double> optim_edge{{v_star, w_star}, cost};
-
-                return optim_edge;
+                return min_edge{{v_star, w_star}, cost};
             };
 
-
+            // initialize path records and sets for source; seems you can call it with v* and w* both being the source
+            //   but the current implementation requires the graph implement to know dist(a, a) = 0... which it currently
+            //   does not... also, can empty vector manipulations are not well-understood by a doug at this point... HASKELL!!!!!
             update_paths(0, 0);
 
             while (X != V) {
                 // generate frontier set explicitly?
+                vector<min_edge> candidate_edges{};
                 for (auto const &vert : VminX) {
+                    candidate_edges.push_back(greedy_criterion_vert(vert));
+                }
+                auto optim_edge = min_element(begin(candidate_edges), end(candidate_edges), [](const min_edge& e1, const min_edge& e2) { return e1.second < e2.second; });
+                update_paths(optim_edge->first.first, optim_edge->first.second);
+                cout << "let's see if we can get here?";
 
-                }
-                for (auto const &x : F) {
-                    cout << x << endl;
-                }
+
+                // for debugging only
+                cout << "V" << endl;
+                for (auto v : V) { cout << v << endl; }
+                cout << "VminX" << endl;
+                for (auto x : VminX) { cout << x << endl; }
+                cout << "X" << endl;
+                for (auto x : X) { cout << x << endl; }
+
                 break;
     //        auto iter_result = dijkstra_greedy_crit(F);
-    //            }
             }
         }
 };
