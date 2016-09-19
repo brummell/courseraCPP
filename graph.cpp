@@ -40,6 +40,13 @@ struct Vertex {
     // possible implement a conversion to int type, possible through name map, to pass vertex more easily to functions
     int id;
     unordered_map<int, double> edges{{id, 0.0}}; // TODO: should be unordered, once reasonable has defined
+    set<int> get_adjacent_nodes() {
+        set<int> keys{};
+        for (const auto &x : edges) {
+            keys.insert(x.first);
+        }
+        return keys;
+    }
 };
 
 //template <typename T>
@@ -70,7 +77,7 @@ class Graph {
     public:
         // constructors
         // create random graph TODO: make sure connected?
-        Graph(double target_density = .80, pair<int, int> edge_range = {0, 1}, int size = 10) : target_density(
+        Graph(double target_density = .10, pair<int, int> edge_range = {0, 1}, int size = 10) : target_density(
                 target_density), edge_range(edge_range), size(size), graph() {
             for (int i = 0; i < size; ++i) { graph.push_back(Vertex{i}); }
             // Init Mersenne Twister PRNG
@@ -152,7 +159,7 @@ class Graph {
             // assert source and destination are in set
             using min_edge = pair<pair<int, int>, double>;
 
-            unordered_set<int> VminX, X, V;
+            set<int> VminX, X, V;
             vector<double> A(size);
             vector<vector<int>> B(size); //TODO: something sorted
             for (int i = 0; i < size; ++i) {
@@ -168,96 +175,81 @@ class Graph {
                 B[w_star].push_back(w_star);
             };
 
-            auto greedy_criterion_vert = [&](int vert_index) {
+            auto greedy_criterion_vert = [&](int w) {
+                cout << "w: " << w << endl;
                 // takes vertices from XminV and returns min dijsktra greedy score
                 double min{10000000000.}, cost{};
                 int v_star{}, w_star{};
 
-                for (auto const &edge : graph[vert_index].edges) {
-                    if (VminX.count(edge.first)) { // equivalent of generating frontier set
-                        cost = A[vert_index] + edge.second;
+                for (auto const &v : graph[w].edges) {
+                    if (X.count(v.first) and v.first != w) { // is this v or a node in V-X in X yet, equivalent of generating frontier set
+                        cout << "v*: " << v.first << endl;
+                        cost = A[v.first] + v.second;
+                        cout << "cost: " << cost << endl;
                         if (cost <= min) {
                             min = cost;
-                            v_star = vert_index;
-                            w_star = edge.first;
+                            v_star = v.first;
+                            w_star = w;
                         }
                     }
                 }
-                cout << v_star << w_star << endl;
+                cout << v_star << " " << w_star << endl;
                 return min_edge{{v_star, w_star}, cost};
             };
 
-            // for debugging only
-            cout << "V" << endl;
-            for (auto v : V) { cout << v << ", "; }
-            cout << endl;
-            cout << "VminX" << endl;
-            for (auto x : VminX) { cout << x << ", "; }
-            cout << endl;
-            cout << "X" << endl;
-            for (auto x : X) { cout << x << ", "; }
-            cout << endl;
 
             // initialize path records and sets for source; seems you can call it with v* and w* both being the source
             //   but the current implementation requires the graph implement to know dist(a, a) = 0... which it currently
             //   does not... also, can empty vector manipulations are not well-understood by a doug at this point... HASKELL!!!!!
             update_paths(0, 0);
 
-
-            // for debugging only
-            cout << "V" << endl;
-            for (auto v : V) { cout << v << ", "; }
-            cout << endl;
-            cout << "VminX" << endl;
-            for (auto x : VminX) { cout << x << ", "; }
-            cout << endl;
-            cout << "X" << endl;
-            for (auto x : X) { cout << x << ", "; }
-            cout << endl;
-
             while (X != V) {
                 // generate frontier set explicitly?
                 vector<min_edge> candidate_edges{};
-                for (auto const &vert : X) {
-                    candidate_edges.push_back(greedy_criterion_vert(vert));
+                for (auto const &vert : VminX) {
+                    cout << "THIS RUN IS FOR VERTEX " << vert << " from X" << endl;
+                    set<int> intersection{};
+                    auto outnodes = graph[vert].get_adjacent_nodes();
+                    set_intersection(begin(outnodes), end(outnodes), begin(X), end(X), inserter(intersection, begin(intersection)));
+                    if (intersection.size() != 0) {
+                        candidate_edges.push_back(greedy_criterion_vert(vert));
+                        for (auto v : candidate_edges) { cout << v.first.first << " " << v.first.second << ", "; }
+                    }
+
                 }
                 auto optim_edge = min_element(begin(candidate_edges), end(candidate_edges), [](const min_edge& e1, const min_edge& e2) { return e1.second < e2.second; });
-
+                cout << optim_edge->first.first << " " << optim_edge->first.second << " " << optim_edge->second << endl;
                 update_paths(optim_edge->first.first, optim_edge->first.second);
                 cout << "let's see if we can get here?" << endl;
 
-
-                // for debugging only
-                cout << "V" << endl;
-                for (auto v : V) { cout << v << ", "; }
-                cout << endl;
-                cout << endl;
-                cout << "VminX" << endl;
-                for (auto x : VminX) { cout << x << ", "; }
-                cout << endl;
-                cout << endl;
-                cout << "X" << endl;
-                for (auto x : X) { cout << x << ", "; }
-                cout << endl;
-                cout << endl;
-
-                cout << "A" << endl;
-                for (auto x : A) { cout << x << ", "; }
-                cout << endl;
-                cout << endl;
-
-                cout << "B" << endl;
-                int i = 0;
-                for (auto b : B) {
-                    cout << i << ": ";
-                    for (auto x : b) { cout << x << ", "; }
-                    i += 1;
-                }
-                cout << endl;
-
-                break;
-    //        auto iter_result = dijkstra_greedy_crit(F);
             }
+        // for debugging only
+        cout << "V" << endl;
+        for (auto v : V) { cout << v << ", "; }
+        cout << endl;
+        cout << endl;
+        cout << "VminX" << endl;
+        for (auto x : VminX) { cout << x << ", "; }
+        cout << endl;
+        cout << endl;
+        cout << "X" << endl;
+        for (auto x : X) { cout << x << ", "; }
+        cout << endl;
+        cout << endl;
+
+        cout << "A" << endl;
+        for (auto x : A) { cout << x << ", "; }
+        cout << endl;
+        cout << endl;
+
+        cout << "B" << endl;
+        int i = 0;
+        for (auto b : B) {
+            cout << i << ": ";
+            for (auto x : b) { cout << x << ", "; }
+            i += 1;
+        }
+        cout << endl;
         }
 };
 
