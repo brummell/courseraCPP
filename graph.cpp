@@ -26,15 +26,13 @@
 #include <unordered_set>
 #include <iomanip>
 #include <string>
+#include <queue>
 #include <iostream>
 #include <algorithm>
 #include <cmath>
 
 
 using namespace std;
-
-
-
 
 struct Vertex {
     // possible implement a conversion to int type, possible through name map, to pass vertex more easily to functions
@@ -76,15 +74,15 @@ class Graph {
 
     public:
         // constructors
+        Graph() : graph() {};
         // create random graph TODO: make sure connected?
-        Graph(double target_density = .10, pair<int, int> edge_range = {0, 1}, int size = 10) : target_density(
+        Graph(double target_density, int size, pair<int, int> edge_range = {0, 1}) : target_density(
                 target_density), edge_range(edge_range), size(size), graph() {
             for (int i = 0; i < size; ++i) { graph.push_back(Vertex{i}); }
             // Init Mersenne Twister PRNG
             mt19937 gen(rand());
             uniform_int_distribution<> edge_dstr(0, size - 1);
             uniform_real_distribution<> weight_dstr(0.00001, 1.);
-            // this may actually produce fewer that required, but at reasonable sizes/densities, should be close enough for a homework
             int max_possible_edges = (size * (size - 1)) / 2;
             int necessary_edges = floor(max_possible_edges * target_density);
             int edge_count{0};
@@ -131,7 +129,10 @@ class Graph {
 
     //        auto shortest_path_calc(int source);         friends?
 
-        auto minimum_cuts_of_some_sort() {return 0;};
+        auto minimum_cuts_of_some_sort() {return 0;}
+
+        auto connected_component(int source_node) {return 0;} //return new map of new keys pointing to old values? new Graph?
+
 
         inline auto are_adjacent(Vertex x, Vertex y) {
             // test whether there is an edge from node x to node y.s
@@ -151,12 +152,58 @@ class Graph {
         //  array or map
 
     //        auto Graph::shortest_path_calc(int source) {
+
+
+        auto recompute_heap_key (const Vertex& vertex) {
+            auto new_edges = vertex.edges;
+            return new_edges;
+        };
+
+        auto shortest_path_optim() {
+            set<int> VminX, X, V;
+            vector<double> A(size);
+            vector<vector<int>> B(size); //TODO: something sorted
+            for (int i = 0; i < size; ++i) {
+                V.insert(i);
+                VminX.insert(i);
+            }
+
+            using min_edge = pair<pair<int, int>, double>;
+            auto min_cmp = [](const min_edge& left, const min_edge& right) { return left.second > right.second; };
+            priority_queue<int, std::vector<int>, decltype(min_cmp)> vertex_heap(min_cmp); // prog just vert, but then can't cx the path
+
+            auto greedy_criterion = [&](int w) {  // returns min dijsktra greedy score for all edges in the frontier
+                double min{10000000000.}, cost{};
+                int v_star{}, w_star{};
+                for (auto const &v : graph[w].edges) {
+                    if (X.count(v.first) and v.first != w) { // is this in frontier set
+                        cost = A[v.first] + v.second;
+                        if (cost <= min) { min = cost; v_star = v.first; w_star = w; }
+                    }
+                }
+                return min_edge{{v_star, w_star}, cost};
+            };
+
+            auto update_paths = [&](int v_star, int w_star) {
+                A[w_star] = graph[w_star].edges[v_star] + A[v_star];
+                X.insert(w_star);
+                VminX.erase(VminX.find(w_star));
+                B[w_star] = B[v_star];
+                B[w_star].push_back(w_star);
+
+                update_heap();
+            };
+
+            update_paths(0, 0);
+
+            for (auto const &w : VminX) {
+                min_edge =
+                vertex_heap.push()
+            }
+
+        };
+
         auto shortest_path(int source) {
-            //    using iset = unordered_set<int>;
-            // Takes set of vertices and returns min scoring vertex(edge) using Dijkstra's greedy score
-            // THIS COULD BE IMPLEMENTED FROM THE GET GO FOR THE HEAP BY RETURNING THE MIN GREEDY SCORE FOR ALL IT'S EDGES IN X --I THINK, ANYWAY
-            // for now, will just use indices... convert for nodes later.
-            // assert source and destination are in set
             using min_edge = pair<pair<int, int>, double>;
 
             set<int> VminX, X, V;
@@ -176,16 +223,14 @@ class Graph {
             };
 
             auto greedy_criterion_vert = [&](int w) {
-                cout << "w: " << w << endl;
                 // takes vertices from XminV and returns min dijsktra greedy score
                 double min{10000000000.}, cost{};
                 int v_star{}, w_star{};
 
                 for (auto const &v : graph[w].edges) {
-                    if (X.count(v.first) and v.first != w) { // is this v or a node in V-X in X yet, equivalent of generating frontier set
-                        cout << "v*: " << v.first << endl;
+                    if (X.count(v.first) and
+                        v.first != w) { // is this v or a node in V-X in X yet, equivalent of generating frontier set
                         cost = A[v.first] + v.second;
-                        cout << "cost: " << cost << endl;
                         if (cost <= min) {
                             min = cost;
                             v_star = v.first;
@@ -193,7 +238,6 @@ class Graph {
                         }
                     }
                 }
-                cout << v_star << " " << w_star << endl;
                 return min_edge{{v_star, w_star}, cost};
             };
 
@@ -207,51 +251,39 @@ class Graph {
                 // generate frontier set explicitly?
                 vector<min_edge> candidate_edges{};
                 for (auto const &vert : VminX) {
-                    cout << "THIS RUN IS FOR VERTEX " << vert << " from X" << endl;
                     set<int> intersection{};
                     auto outnodes = graph[vert].get_adjacent_nodes();
-                    set_intersection(begin(outnodes), end(outnodes), begin(X), end(X), inserter(intersection, begin(intersection)));
+                    set_intersection(begin(outnodes), end(outnodes), begin(X), end(X),
+                                     inserter(intersection, begin(intersection)));
                     if (intersection.size() != 0) {
                         candidate_edges.push_back(greedy_criterion_vert(vert));
                         for (auto v : candidate_edges) { cout << v.first.first << " " << v.first.second << ", "; }
                     }
 
                 }
-                auto optim_edge = min_element(begin(candidate_edges), end(candidate_edges), [](const min_edge& e1, const min_edge& e2) { return e1.second < e2.second; });
-                cout << optim_edge->first.first << " " << optim_edge->first.second << " " << optim_edge->second << endl;
+                auto optim_edge = min_element(begin(candidate_edges), end(candidate_edges),
+                                              [](const min_edge &e1, const min_edge &e2) {
+                                                  return e1.second < e2.second;
+                                              });
                 update_paths(optim_edge->first.first, optim_edge->first.second);
-                cout << "let's see if we can get here?" << endl;
 
             }
-        // for debugging only
-        cout << "V" << endl;
-        for (auto v : V) { cout << v << ", "; }
-        cout << endl;
-        cout << endl;
-        cout << "VminX" << endl;
-        for (auto x : VminX) { cout << x << ", "; }
-        cout << endl;
-        cout << endl;
-        cout << "X" << endl;
-        for (auto x : X) { cout << x << ", "; }
-        cout << endl;
-        cout << endl;
 
-        cout << "A" << endl;
-        for (auto x : A) { cout << x << ", "; }
-        cout << endl;
-        cout << endl;
+            cout << "A" << endl;
+            for (auto x : A) { cout << x << ", "; }
+            cout << endl;
+            cout << endl;
 
-        cout << "B" << endl;
-        int i = 0;
-        for (auto b : B) {
-            cout << i << ": ";
-            for (auto x : b) { cout << x << ", "; }
-            i += 1;
-        }
-        cout << endl;
+            cout << "B" << endl;
+            int i = 0;
+            for (auto b : B) {
+                cout << i << ": ";
+                for (auto x : b) { cout << x << ", "; }
+                i += 1;
+            }
         }
 };
+
 
 //        auto shortest_path(int source, int sink) {;}
 //        auto generate_all_shortest_paths() {return 0;}
@@ -275,28 +307,41 @@ ostream &operator<<(ostream &os, const Graph &graph) {
     return os;
 }
 
-
-
-//Notes and Reminders:
-//
-//Write an appropriate set of constructors for each of your classes ensuring proper initialization – especially think about the process for declaring and initializing a graph.
-//In this implementation, assume that an edge will have a positive cost function like distance (no negative edge cost).
-//Assume the graph edges (E) are undirected.
-//Ensure that your ADTs support a graph of at least size 50.
-//The random graph procedure should have edge density as a parameter and distance range as a parameter.
-//Random graph generator should generate a sufficient set of edges to satisfy the edge density parameter, and each edge should be assigned a randomly generated cost based on the distance range parameter.
-//So a graph whose density is 0.1 would have 10% of its edges picked at random and its edge distance would be selected at random from the distance range.
-//Compute for a set of randomly generated graphs an average shortest path.
-
-
-
 int main() {
-    Graph g{};
+    Graph g{.10, 250};
     cout << setprecision(5);
-    cout << g << endl;
+//    cout << g << endl;
 //   cout << g.neighbors(93).size() << endl;
     cout << g.vertex_count() << endl;
     cout << g.edge_count() << endl;
     g.shortest_path(0);
     return 0;
 }
+
+
+
+// for debugging only
+//cout << "V" << endl;
+//for (auto v : V) { cout << v << ", "; }
+//cout << endl;
+//cout << endl;
+//cout << "VminX" << endl;
+//for (auto x : VminX) { cout << x << ", "; }
+//cout << endl;
+//cout << endl;
+//cout << "X" << endl;
+//for (auto x : X) { cout << x << ", "; }
+//cout << endl;
+//cout << endl;
+//
+//cout << "A" << endl;
+//for (auto x : A) { cout << x << ", "; }
+//cout << endl;
+//cout << endl;
+//
+//cout << "B" << endl;
+//int i = 0;
+//for (auto b : B) {
+//cout << i << ": ";
+//for (auto x : b) { cout << x << ", "; }
+//i += 1;
