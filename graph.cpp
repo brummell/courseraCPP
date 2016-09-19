@@ -38,7 +38,7 @@ using namespace std;
 struct Vertex {
     // possible implement a conversion to int type, possible through name map, to pass vertex more easily to functions
     int id;
-    unordered_map<int, double> edges; // TODO: should be unordered, once reasonable has defined
+    unordered_map<int, double> edges{{id, 0.0}}; // TODO: should be unordered, once reasonable has defined
 };
 
 //template <typename T>
@@ -53,6 +53,8 @@ class Graph {
 //      those core reqs first and foremost. Ad hoc/after-the-fact add and delete are not major concerns. Neither is named
 //      node-subgraph analysis. If I ever have use for more db-y type things and for whatever reason don't just use Titan or w/e
 //      though the same could be said for boost for the comp stuff.
+//  3. Nodes have themselves as a viable edge with 0 weight for now... this may cause a lot of unacceptable overhead when using edges
+//       as a standin for viable outnodes, but I like this better at the moment for purity reasons that I may have wrong in my head LULZ
 
     private:
         unordered_map<int, int> index_map; //template for when node names aren't just the integers of where they were placed
@@ -122,6 +124,8 @@ class Graph {
 
     //        auto shortest_path_calc(int source);         friends?
 
+        auto minimum_cuts_of_some_sort() {return 0;};
+
         inline auto are_adjacent(Vertex x, Vertex y) {
             // test whether there is an edge from node x to node y.s
         };
@@ -154,12 +158,21 @@ class Graph {
                 VminX.insert(i);
             }
 
-            auto update_paths = [](int w_star, int v_star) {
-                A[w_star] = 0.;
+            auto update_paths = [&](int w_star, int v_star) {
+                A[w_star] = graph[w_star].edges[v_star] + A[v_star];
                 X.insert(w_star);
                 VminX.erase(VminX.find(w_star));
-                B[source] = B[path_to_source].push_back(source);
+                B[w_star] = B[v_star];
+                B[w_star].push_back(w_star);
             };
+
+            // initialize path records and sets for source; seems you can call it with v* and w* both being the source
+            //   but the current implementation requires the graph implement to know dist(a, a) = 0... which it currently
+            //   does not... also, can empty vector manipulations are not well-understood by a doug at this point... HASKELL!!!!!
+            //            A[source] = 0.;
+            //            X.insert(source);
+            //            VminX.erase(VminX.find(source));
+            //            B[source].push_back(source);
 
             auto greedy_criterion_vert = [&](int vert_index) {
                 // takes vertices from XminV and returns min dijsktra greedy
@@ -181,10 +194,7 @@ class Graph {
                 return optim_edge;
             };
 
-            A[source] = 0.;
-            X.insert(source);
-            VminX.erase(VminX.find(source));
-            B[source].push_back(source);
+
 
 
             while (X != V) {
@@ -206,12 +216,8 @@ class Graph {
         }
 };
 
-
-
-
-
-
 //        auto shortest_path(int source, int sink) {;}
+//        auto generate_all_shortest_paths() {return 0;}
 
 
 
@@ -256,6 +262,6 @@ int main() {
 //   cout << g.neighbors(93).size() << endl;
     cout << g.vertex_count() << endl;
     cout << g.edge_count() << endl;
-    g.shortest_path_calc(0);
+//    g.shortest_path(0);
     return 0;
 }
