@@ -79,9 +79,8 @@ class Graph {
             // this may actually produce fewer that required, but at reasonable sizes/densities, should be close enough for a homework
             int max_possible_edges = (size * (size - 1)) / 2;
             int necessary_edges = floor(max_possible_edges * target_density);
-            // Generate connections TODO: produces slightly off count due to self connections
             int edge_count{0};
-            while (edge_count <= necessary_edges) {
+            while (edge_count <= necessary_edges) {  // Generate connections
                 int vertex_a = edge_dstr(gen);
                 int vertex_b = edge_dstr(gen);
                 if (vertex_a != vertex_b and not graph[vertex_a].edges.count(vertex_b)) {
@@ -175,12 +174,12 @@ class Graph {
             //            B[source].push_back(source);
 
             auto greedy_criterion_vert = [&](int vert_index) {
-                // takes vertices from XminV and returns min dijsktra greedy
+                // takes vertices from XminV and returns min dijsktra greedy score
                 double min{10000000000.}, cost{};
                 int v_star{}, w_star{};
 
                 for (auto const &edge : graph[vert_index].edges) {
-                    if (not X.count(edge.first)) {
+                    if (not X.count(edge.first)) { // equivalent of generating frontier set
                         cost = A[edge.first] + edge.second;
                         if (cost <= min) {
                             v_star = edge.first;
@@ -195,16 +194,12 @@ class Graph {
             };
 
 
-
+            update_paths(0, 0);
 
             while (X != V) {
-                set<int> F{}; // generate frontier set
-                for (auto const &vert : X) {
-                    for (auto const &edge : graph[source].edges) {
-                        if (VminX.count(edge.first) != 0) {
-                            F.insert(edge.first);
-                        }
-                    }
+                // generate frontier set explicitly?
+                for (auto const &vert : VminX) {
+
                 }
                 for (auto const &x : F) {
                     cout << x << endl;
@@ -218,8 +213,6 @@ class Graph {
 
 //        auto shortest_path(int source, int sink) {;}
 //        auto generate_all_shortest_paths() {return 0;}
-
-
 
 
 //        vertices(List): list of vertices in G(V,E).
@@ -262,6 +255,6 @@ int main() {
 //   cout << g.neighbors(93).size() << endl;
     cout << g.vertex_count() << endl;
     cout << g.edge_count() << endl;
-//    g.shortest_path(0);
+    g.shortest_path(0);
     return 0;
 }
