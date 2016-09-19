@@ -2,6 +2,21 @@
 // Created by Brummell, Doug on 8/14/16.
 //
 
+// undirected acyclic graph, strictly positive weights (0==no edge)
+// adjacency list representation for now... binary heap allows faster Dykstra's
+// dumb index version, should use other branch in git with pointer one some day... getter/setters to abstract over both
+// WILL CREATE DIFFERENT  STRUCTS ETC DEPENDING ON CONSTRUCTION (DENSITY, DIRECTEDNESS, ETC)
+// TODO: Add DAG, UAG, DCG, UCG options, unweighted as well
+// TODO: add iterator?
+
+//struct Edge {
+//    int vertex;
+//    double weight; // comparable, for sake of < op for set insertion
+//};
+//inline bool operator<(const Edge &lhs, const Edge &rhs) {
+//    return lhs.weight < rhs.weight;
+//}
+
 //#include "graph.h"
 #include <random>
 #include <vector>
@@ -17,13 +32,7 @@
 
 using namespace std;
 
-//struct Edge {
-//    int vertex;
-//    double weight; // comparable, for sake of < op for set insertion
-//};
-//inline bool operator<(const Edge &lhs, const Edge &rhs) {
-//    return lhs.weight < rhs.weight;
-//}
+
 
 
 struct Vertex {
@@ -32,14 +41,21 @@ struct Vertex {
     unordered_map<int, double> edges; // TODO: should be unordered, once reasonable has defined
 };
 
+//template <typename T>
 class Graph {
-    // undirected acyclic graph, strictly positive weights (0==no edge)
-    // adjacency list representation for now... binary heap allows faster Dykstra's
-    // dumb index version, should use other branch in git with pointer one some day... getter/setters to abstract over both
-    // WILL CREATE DIFFERENT  STRUCTS ETC DEPENDING ON CONSTRUCTION (DENSITY, DIRECTEDNESS, ETC)
-    // TODO: Add DAG, UAG, DCG, UCG options, unweighted as well
-    // TODO: add iterator?
+//    using iset = unordered_set<int>;
+// DESIGN PHILOSOPHY CONSIDERATIONS:
+//  1. Until shown it's impossible, if not pointer implemented, basic graph operations will occur around int vector indices
+//      rather than named references unless the issue of resizing, reindexing (node_name -> index) is problematic. If possible
+//      it will be done in a blackbox fashion to the extent that the user may use either (typing issues if they choose int names...
+//      more to think about obviously
+//  2. For the time being, this is a course project, or at most, very computation focused, so the implementation will support
+//      those core reqs first and foremost. Ad hoc/after-the-fact add and delete are not major concerns. Neither is named
+//      node-subgraph analysis. If I ever have use for more db-y type things and for whatever reason don't just use Titan or w/e
+//      though the same could be said for boost for the comp stuff.
+
     private:
+        unordered_map<int, int> index_map; //template for when node names aren't just the integers of where they were placed
         vector<Vertex> graph;
         unordered_map<int, int> vertex_map;
         pair<int, int> edge_range;
@@ -53,7 +69,7 @@ class Graph {
         // create random graph TODO: make sure connected?
         Graph(double target_density = .80, pair<int, int> edge_range = {0, 1}, int size = 10) : target_density(
                 target_density), edge_range(edge_range), size(size), graph() {
-            for (int i = 0; i < size; ++i) { graph.push_back(Vertex{}); }
+            for (int i = 0; i < size; ++i) { graph.push_back(Vertex{i}); }
             // Init Mersenne Twister PRNG
             mt19937 gen(rand());
             uniform_int_distribution<> edge_dstr(0, size - 1);
@@ -104,7 +120,7 @@ class Graph {
             return count / 2;
         };
 
-        auto shortest_path_calc(int source);
+    //        auto shortest_path_calc(int source);         friends?
 
         inline auto are_adjacent(Vertex x, Vertex y) {
             // test whether there is an edge from node x to node y.s
@@ -122,54 +138,75 @@ class Graph {
         //  and time analysis). Note in some cases such as add(G, x, y) you may also want to have the edge carry
         //  along its cost. Another approach could be to use (x, y) to index a cost stored in an associated
         //  array or map
-};
 
-auto Graph::shortest_path_calc(int source) {
-//    auto dijkstra_greedy_crit = [](Edge e) {
-//        auto min{100000};
-//        auto v_star, w_star;
-//        for (auto const& x : X) {
-//            for (auto const& edge : graph[x].edges) { //TODO: not gonna work
-//                if (VminX.count(edge.vertex)) {
-//                    auto cost = A[x] + edge.weight;
-//                    if (cost <= min) min = cost;
-//                }
-//            }
-//        }
-//        return pair<min,
-//                                            };
-    // for now, will just use indices... convert for nodes later.
-    // assert source and destination are in set
-    unordered_set<int> VminX, X, V;
-    vector<double> A(size);
-    vector<vector<int>> B(size); //TODO: something sorted
-    for (int i = 0; i < size; ++i) {
-        V.insert(i);
-        VminX.insert(i);
-    }
-    cout << "here_0" << endl;
-    // base case / init
-    A[source] = 0.;
-    X.insert(source);
-    VminX.erase(VminX.find(source));
-    B[source].push_back(source);
-    while (X != V) {
-        // generate frontier set
-        set<int> F{};
-        for (auto const &vert : X) {
-            for (auto const &edge : graph[source].edges) {
-                if (VminX.count(edge.first) != 0) {
-                    F.insert(edge.first);
+    //        auto Graph::shortest_path_calc(int source) {
+        auto shortest_path(int source) {
+            //    using iset = unordered_set<int>;
+            // Takes set of vertices and returns min scoring vertex(edge) using Dijkstra's greedy score
+            // THIS COULD BE IMPLEMENTED FROM THE GET GO FOR THE HEAP BY RETURNING THE MIN GREEDY SCORE FOR ALL IT'S EDGES IN X --I THINK, ANYWAY
+            // for now, will just use indices... convert for nodes later.
+            // assert source and destination are in set
+            unordered_set<int> VminX, X, V;
+            vector<double> A(size);
+            vector<vector<int>> B(size); //TODO: something sorted
+            for (int i = 0; i < size; ++i) {
+                V.insert(i);
+                VminX.insert(i);
+            }
+
+            auto update_paths = [](int w_star, int v_star) {
+                A[w_star] = 0.;
+                X.insert(w_star);
+                VminX.erase(VminX.find(w_star));
+                B[source] = B[path_to_source].push_back(source);
+            };
+
+            auto greedy_criterion_vert = [&](int vert_index) {
+                // takes vertices from XminV and returns min dijsktra greedy
+                double min{10000000000.}, cost{};
+                int v_star{}, w_star{};
+
+                for (auto const &edge : graph[vert_index].edges) {
+                    if (not X.count(edge.first)) {
+                        cost = A[edge.first] + edge.second;
+                        if (cost <= min) {
+                            v_star = edge.first;
+                            w_star = vert_index;
+                        }
+                    }
                 }
+
+                pair<pair<int, int>, double> optim_edge{{v_star, w_star}, cost};
+
+                return optim_edge;
+            };
+
+            A[source] = 0.;
+            X.insert(source);
+            VminX.erase(VminX.find(source));
+            B[source].push_back(source);
+
+
+            while (X != V) {
+                set<int> F{}; // generate frontier set
+                for (auto const &vert : X) {
+                    for (auto const &edge : graph[source].edges) {
+                        if (VminX.count(edge.first) != 0) {
+                            F.insert(edge.first);
+                        }
+                    }
+                }
+                for (auto const &x : F) {
+                    cout << x << endl;
+                }
+                break;
+    //        auto iter_result = dijkstra_greedy_crit(F);
+    //            }
             }
         }
-        for (auto const &x : F) {
-            cout << x << endl;
-        }
-        break;
-//        auto iter_result = dijkstra_greedy_crit(F);
-    }
 };
+
+
 
 
 
@@ -216,10 +253,9 @@ int main() {
     Graph g{};
     cout << setprecision(5);
     cout << g << endl;
-//    cout << g.neighbors(93).size() << endl;
+//   cout << g.neighbors(93).size() << endl;
     cout << g.vertex_count() << endl;
     cout << g.edge_count() << endl;
-
     g.shortest_path_calc(0);
     return 0;
 }
