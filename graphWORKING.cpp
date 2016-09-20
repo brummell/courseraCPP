@@ -108,12 +108,12 @@ class Graph {
                         }
                     }
                 }
-//                cout << "(" << v_star << ", " << w_star << "): " << cost << endl;
+                cout << "(" << v_star << ", " << w_star << "): " << cost << endl;
                 return min_edge{{v_star, w_star}, cost};
             };
 
             auto update_paths = [&](int v_star, int w_star, double cost) {
-                A[w_star] = cost + A[v_star]; //THE PROBLEM WITH ADDITIONS IS HERE!!!!!!
+                A[w_star] = cost; //THE PROBLEM WITH ADDITIONS IS HERE!!!!!!
                 X.insert(w_star);
                 VminX.erase(VminX.find(w_star));
                 B[w_star] = B[v_star];
@@ -121,22 +121,21 @@ class Graph {
             };
 
             auto update_heap_keys = [&](const int &old_v, const int &old_w, const double &old_cost) {
-//                cout << "This is all for node: " << old_w << endl;
+                cout << "This is all for node: " << old_w << endl;
                 for (auto const &w : graph[old_w].edges) {
                     if (VminX.count(w.first)) { //in VminX, hence edge is on frontier
                         auto found_itr = find_if(begin(vertex_heap), end(vertex_heap),
                                                  [&](const min_edge &m) { return m.first.second == w.first;}); //should be an edge
                         double new_cost{w.second + A[old_w]};
-//                        cout << "new//                            cout << \"new edge\" << old_w << \", \" << w.first << \": \" << new_cost << endl; cost: " << w.second << ", " << A[old_w] << endl;
                         if (found_itr->second > new_cost) {
-//                            cout << "new edge" << old_w << ", " << w.first << ": " << new_cost << endl;
+                            cout << "new edge" << old_w << ", " << w.first << ": " << new_cost << endl;
                             min_edge new_elem{{old_w, w.first}, new_cost};
                             vertex_heap.erase(found_itr);
                             vertex_heap.insert(new_elem);
                         }
                     }
                 }
-//                cout << "End of it all being for node: " << old_w << endl;
+                cout << "End of it all being for node: " << old_w << endl;
 
             };
 
@@ -152,10 +151,10 @@ class Graph {
             vertex_heap.erase(found_itr);
             A[0] = 0;
 
-//            for (auto x : X) {
-//                cout << x << ", ";
-//                cout << "done" << endl;
-//            }
+            for (auto x : X) {
+                cout << x << ", ";
+                cout << "done" << endl;
+            }
 
 //            update_heap_keys(0); // {{0, 0}, 0}
 
@@ -165,29 +164,23 @@ class Graph {
                 min_edge min{{min_itr->first.first, min_itr->first.second},
                              min_itr->second}; // {{V1, 0}, 1.3442} <- V1 had lowest score, connected to 0
                 vertex_heap.erase(min_itr); // weirdness copy, rework
-//                cout << "edge" << min.first.first << ", " << min.first.second << ": " << min.second << endl;
+                cout << "edge" << min.first.first << ", " << min.first.second << ": " << min.second << endl;
                 update_paths(min.first.first, min.first.second, min.second);
                 update_heap_keys(min.first.first, min.first.second, min.second);
 
+                for (auto x : vertex_heap) {
+                    cout << "(" << x.first.first << ", " << x.first.second << "): " << x.second;
+                }
+                cout << endl << "done" << endl;
 
-//
-//                for (auto x : vertex_heap) {
-//                    cout << "(" << x.first.first << ", " << x.first.second << "): " << x.second;
-//                }
-//                cout << endl << "done" << endl;
-//
-//                cout << "A" << endl;
-//                for (auto x : A) { cout << x << ", "; }
-//                cout << endl;
-//                cout << endl;
+                cout << "A" << endl;
+                for (auto x : A) { cout << x << ", "; }
+                cout << endl;
+                cout << endl;
 
             }
 
-
             cout << vertex_heap.size();
-
-
-
             cout << "B" << endl;
             int i = 0;
             for (auto b : B) {
@@ -198,7 +191,6 @@ class Graph {
             }
         };
 };
-
 
 ostream &operator<<(ostream &os, const Graph &graph) {
     auto g = graph.get_vertices();
@@ -213,9 +205,9 @@ ostream &operator<<(ostream &os, const Graph &graph) {
 }
 
 int main() {
-    Graph g{.50, 5000};
+    Graph g{.90, 5};
     cout << setprecision(5);
-//    cout << g << endl;
+    cout << g << endl;
 //   cout << g.neighbors(93).size() << endl;
 //    cout << g.vertex_count() << endl;
 //    cout << g.edge_count() << endl;
@@ -256,41 +248,6 @@ int main() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-// for debugging only
-//cout << "V" << endl;
-//for (auto v : V) { cout << v << ", "; }
-//cout << endl;
-//cout << endl;
-//cout << "VminX" << endl;
-//for (auto x : VminX) { cout << x << ", "; }
-//cout << endl;
-//cout << endl;
-//cout << "X" << endl;
-//for (auto x : X) { cout << x << ", "; }
-//cout << endl;
-//cout << endl;
-//
-//cout << "A" << endl;
-//for (auto x : A) { cout << x << ", "; }
-//cout << endl;
-//cout << endl;
-//
-//cout << "B" << endl;
-//int i = 0;
-//for (auto b : B) {
-//cout << i << ": ";
-//for (auto x : b) { cout << x << ", "; }
-//i += 1;
 
 
 
