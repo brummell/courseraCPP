@@ -148,7 +148,7 @@ ostream &operator<<(ostream &os, const Graph &graph) {
 
 
 int main() {
-    Graph g{.20, 50, pair<double, double>{1.0,10.0}};
+    Graph g{.50, 500, pair<double, double>{1.0,10.0}};
     auto paths = g.shortest_path(0);
 
 //    cout << g << endl;
