@@ -14,10 +14,14 @@
 #include <iostream>
 #include <algorithm>
 #include <cmath>
+#include <limits>
 
 
 using namespace std;
 
+// Should encapsulate in namespace
+double INF = numeric_limits<double>::infinity();
+int QNAN = numeric_limits<int>::quiet_NaN();
 
 struct Vertex {
     // possible implement a conversion to int type, possible through name map, to pass vertex more easily to functions
@@ -73,9 +77,10 @@ class Graph {
             return graph;
         };
 
+
         auto shortest_path_optim() {
             set<int> VminX, X, V;
-            vector<double> A(size);
+            vector<double> A(size, INF);
             vector<vector<int>> B(size);
             for (int i = 0; i < size; ++i) {
                 V.insert(i);
@@ -84,19 +89,17 @@ class Graph {
 
             using min_edge = pair<pair<int, int>, double>;
             auto min_cmp = [](const min_edge &left, const min_edge &right) { return left.second > right.second; };
-            auto heap_find = [](const min_edge &m) { return m.first.first == 0; }
-            list<S>::iterator it = find_if(l.begin(), l.end(), [](const S &s) { return s.S1 == 0; });
             // priority_queue<min_edge, vector<min_edge>, decltype(min_cmp)> vertex_heap(min_cmp); // prog just vert, but then can't cx the path
             set<min_edge, decltype(min_cmp)> vertex_heap(min_cmp); // prog just vert, but then can't cx the path
 
             auto greedy_criterion = [&](int w) {  // returns min dijsktra greedy score for all edges in the frontier
-                double min{10000000000.}, cost{};
-                int v_star{}, w_star{};
+                double cost{INF};
+                int v_star{QNAN}, w_star{w};
                 for (auto const &v : graph[w].edges) {
                     if (X.count(v.first) and v.first != w) { // is this in frontier set
-                        cost = A[v.first] + v.second;
-                        if (cost <= min) {
-                            min = cost;
+                        double tmp_cost = A[v.first] + v.second;
+                        if (tmp_cost <= cost) {
+                            cost = tmp_cost;
                             v_star = v.first;
                             w_star = w;
                         }
@@ -113,16 +116,18 @@ class Graph {
                 B[w_star].push_back(w_star);
             };
 
-            auto update_heap_keys = [&](const int &old_min_vertex) {
-                for (auto const &w : graph[old_min_vertex].edges) {
-                    if (VminX.count(w.first)) { //in VminX, hence edge is on frontier
-                        vertex_heap.find()
-                    }
-                }
-            };
+//            auto update_heap_keys = [&](const int &old_min) {
+//                for (auto const &w : graph[old_min->first.second].edges) {
+//                    if (VminX.count(w.first)) { //in VminX, hence edge is on frontier
+//                        auto found_itr = find_if(vertex_heap.begin(), vertex_heap.end(),
+//                                                 [&](const min_edge &m) { return m.first.first == w.first;}); //should be an edge
+//                        if (found_itr->second + <= old_min->second) {
+//                            vertex_heap.erase()
+//                        }
+//                    }
+//                }
+//            };
 
-
-            update_paths(0, 0, 0); // INF instead of 0?
 
             // build heap
             for (auto const &w : VminX) {
@@ -130,15 +135,20 @@ class Graph {
                 vertex_heap.insert(optim_w);
             }
 
-            while (X != V) {
-                auto min_itr = vertex_heap.begin();
-                min_edge min{{min_itr->first.first, min_itr->first.second}, min_itr->second};
-                update_paths(min.first.first, min.first.second, min.second);
-                update_heap_key(min.first.second);
-                vertex_heap.erase(next);
-
+            for (auto x : vertex_heap) {
+                cout << "(" << x.first.first << ", " << x.first.second << "): " << x.second;
             }
+            cout << endl;
 
+            update_paths(0, 0, 0); // INF instead of 0?
+//
+//            while (X != V) {
+//                auto min_itr = vertex_heap.begin();
+//                min_edge min{{min_itr->first.first, min_itr->first.second}, min_itr->second}; // {{V1, 0}, 1.3442} <- V1 had lowest score, connected to 0
+//                update_paths(min.first.first, min.first.second, min.second);
+//                update_heap_key(min);
+//                vertex_heap.erase(next);
+//            }
         };
 
 
@@ -158,15 +168,53 @@ ostream &operator<<(ostream &os, const Graph &graph) {
 }
 
 int main() {
-    Graph g{.10, 50};
+    Graph g{.90, 10};
     cout << setprecision(5);
-//    cout << g << endl;
+    cout << g << endl;
 //   cout << g.neighbors(93).size() << endl;
-    cout << g.vertex_count() << endl;
-    cout << g.edge_count() << endl;
-    g.shortest_path(0);
+//    cout << g.vertex_count() << endl;
+//    cout << g.edge_count() << endl;
+    g.shortest_path_optim();
     return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
