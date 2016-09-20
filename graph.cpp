@@ -32,7 +32,48 @@
 #include <cmath>
 
 
+
 using namespace std;
+
+template <typename T>//, decltype(comparator)
+class MinHeap {
+private:
+        vector<T> heap{};
+        auto comp;
+        MinHeap(auto sequence) {
+
+    }
+public:
+    auto min() {
+        return heap.front();
+    };
+
+    void pop_min() {
+        pop_heap(begin(heap), end(heap));
+        heap.pop_back();
+    };
+
+    void push(T elem) {
+        heap.push_back(elem);
+        push_heap(begin(heap), end(heap), comp); //comp?
+    };
+
+    void update_key(T adj_elem) {
+        // vector.erase is linear in adjusted memory, strikes me as inadequate for large graphs
+        // instead find->N(fuck) + swap->1 + pop_back->1 + push_back->1 + push_heap->N)
+        auto old_elem = find(begin(heap), end(heap), adj_elem);
+        auto index = distance(heap.begin(), old_elem);
+        old_elem.second
+        swap(old_elem, end(heap));
+        heap.pop_back();
+        heap.push_back(adj_elem);
+        push_heap(begin(heap), end(heap), comp)
+
+    }
+
+
+
+};
 
 struct Vertex {
     // possible implement a conversion to int type, possible through name map, to pass vertex more easily to functions
@@ -46,6 +87,8 @@ struct Vertex {
         return keys;
     }
 };
+
+
 
 //template <typename T>
 class Graph {
@@ -169,8 +212,9 @@ class Graph {
             }
 
             using min_edge = pair<pair<int, int>, double>;
-            auto min_cmp = [](const min_edge& left, const min_edge& right) { return left.second > right.second; };
-            priority_queue<int, std::vector<int>, decltype(min_cmp)> vertex_heap(min_cmp); // prog just vert, but then can't cx the path
+            auto min_cmp = [](const min_edge &left, const min_edge &right) { return left.second > right.second; };
+//            priority_queue<min_edge, vector<min_edge>, decltype(min_cmp)> vertex_heap(min_cmp); // prog just vert, but then can't cx the path
+            set<min_edge, decltype(min_cmp)> vertex_heap(min_cmp); // prog just vert, but then can't cx the path
 
             auto greedy_criterion = [&](int w) {  // returns min dijsktra greedy score for all edges in the frontier
                 double min{10000000000.}, cost{};
@@ -184,24 +228,42 @@ class Graph {
                 return min_edge{{v_star, w_star}, cost};
             };
 
-            auto update_paths = [&](int v_star, int w_star) {
-                A[w_star] = graph[w_star].edges[v_star] + A[v_star];
+            auto update_paths = [&](int v_star, int w_star, double cost) {
+                A[w_star] = cost + A[v_star];
                 X.insert(w_star);
                 VminX.erase(VminX.find(w_star));
                 B[w_star] = B[v_star];
                 B[w_star].push_back(w_star);
-
-                update_heap();
             };
+
+            auto update_heap_key = [&](const int &old_min) {
+                for (auto const &w : graph[old_min].edges) {
+                    if (VminX.count(w.first)) {
+                        vertex_heap.
+                    }
+                }
+            };
+
 
             update_paths(0, 0);
 
+            // build heap
             for (auto const &w : VminX) {
-                min_edge =
-                vertex_heap.push()
+                auto optim_w = greedy_criterion(w); //need to check that vaild result returned
+                vertex_heap.insert(optim_w);
             }
 
-        };
+            while (X != V) {
+                auto min_itr = vertex_heap.begin();
+                min_edge min {{min_itr->first.first, min_itr->first.second}, min_itr->second};
+                update_paths(min.first.first, min.first.second, min.second);
+                update_heap_key(min.first.second);
+                vertex_heap.erase(next);
+
+            }
+
+
+            };
 
         auto shortest_path(int source) {
             using min_edge = pair<pair<int, int>, double>;
