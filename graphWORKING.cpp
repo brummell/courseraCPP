@@ -51,13 +51,13 @@ class Graph {
         // constructors
         Graph() : graph() {};
         // create random graph TODO: make sure connected?
-        Graph(double target_density, int size, pair<int, int> edge_range = {0, 1}) : target_density(
+        Graph(double target_density, int size, pair<int, int> edge_range = {0.00001, 10.}) : target_density(
                 target_density), edge_range(edge_range), size(size), graph() {
             for (int i = 0; i < size; ++i) { graph.push_back(Vertex{i}); }
             // Init Mersenne Twister PRNG
             mt19937 gen(rand());
             uniform_int_distribution<> edge_dstr(0, size - 1);
-            uniform_real_distribution<> weight_dstr(0.00001, 1.);
+            uniform_real_distribution<> weight_dstr(edge_range.first, edge_range.second);
             int max_possible_edges = (size * (size - 1)) / 2;
             int necessary_edges = floor(max_possible_edges * target_density);
             int edge_count{0};
@@ -120,17 +120,18 @@ class Graph {
                 B[w_star].push_back(w_star);
             };
 
-            auto update_heap_keys = [&](const int &old_w, const int &old_v, const double &old_cost) {
+            auto update_heap_keys = [&](const int &old_v, const int &old_w, const double &old_cost) {
                 for (auto const &w : graph[old_w].edges) {
                     if (VminX.count(w.first)) { //in VminX, hence edge is on frontier
                         auto found_itr = find_if(begin(vertex_heap), end(vertex_heap),
                                                  [&](const min_edge &m) { return m.first.second == w.first;}); //should be an edge
                         double new_cost{w.second + A[old_w]};
+                        cout << "new cost: " << w.second << ", " << A[old_w] << endl;
                         if (found_itr->second > new_cost) {
                             cout << "new edge" << old_w << ", " << w.first << ": " << new_cost << endl;
                             min_edge new_elem{{old_w, w.first}, new_cost};
                             vertex_heap.erase(found_itr);
-//                            vertex_heap.insert(new_elem);
+                            vertex_heap.insert(new_elem);
                         }
                     }
                 }
@@ -146,21 +147,7 @@ class Graph {
             auto found_itr = find_if(vertex_heap.begin(), vertex_heap.end(), [&](const min_edge &m) { return m.first.second == w;});
             vertex_heap.insert(min_edge {{found_itr->first.first, found_itr->first.second}, 0});
             vertex_heap.erase(found_itr);
-
-            update_paths(0, 0, 0); // INF instead of 0?
-
-
-            for (auto x : vertex_heap) {
-                cout << "(" << x.first.first << ", " << x.first.second << "): " << x.second << ", ";
-            }
-            cout << "first: " << begin(vertex_heap)->first.second << endl << "done" << endl;
-
-
-            cout << endl;
-
-
-
-
+            A[0] = 0;
 
             for (auto x : X) {
                 cout << x << ", ";
@@ -174,24 +161,19 @@ class Graph {
                 auto min_itr = vertex_heap.begin();
                 min_edge min{{min_itr->first.first, min_itr->first.second},
                              min_itr->second}; // {{V1, 0}, 1.3442} <- V1 had lowest score, connected to 0
-                cout << "HERE1" << endl;
                 vertex_heap.erase(min_itr); // weirdness copy, rework
-                cout << "HERE1.5" << endl;
                 cout << "edge" << min.first.first << ", " << min.first.second << ": " << min.second << endl;
-
                 update_paths(min.first.first, min.first.second, min.second);
                 cout << "HERE2" << endl;
                 update_heap_keys(min.first.first, min.first.second, min.second);
-                break;
             }
 
-//
-            for (auto x : vertex_heap) {
-                cout << "(" << x.first.first << ", " << x.first.second << "): " << x.second;
-                cout << endl << "done" << endl;
-
-            }
-            cout << endl;
+////
+//            for (auto x : vertex_heap) {
+//                cout << "(" << x.first.first << ", " << x.first.second << "): " << x.second;
+//                cout << endl << "done" << endl;
+//            }
+//            cout << endl;
 
             cout << vertex_heap.size();
 
@@ -204,7 +186,8 @@ class Graph {
             int i = 0;
             for (auto b : B) {
                 cout << i << ": ";
-                for (auto x : b) { cout << x << ", "; }
+                for (auto x : b) { cout << x << ", ";}
+                cout << endl;
                 i += 1;
             }
         };
