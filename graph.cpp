@@ -143,21 +143,32 @@ class Graph {
 
             VminX.erase(0);
             X.insert(0);
-            VminX.insert(0);
-            min_edge mini_edge{{QNAN, QNAN}, INF};
+            A[0] = 0;
+            B[0].push_back(0);
+//            VminX.insert(0);
             while (VminX.size() != 0) {
+                min_edge mini_edge{{QNAN, QNAN}, INF}; // TODO: suspect this is too much
                 for (auto x : X) {
-                    for (auto edge : graph[0].edges) {
-                        if (VminX.count(edge.first and edge.second < mini_edge.second)) {
+                    cout << "working with edge:  " << x << endl;
+                    for (auto edge : graph[x].edges) {
+                        if (VminX.count(edge.first) and edge.second < mini_edge.second) {
                             mini_edge.first.first = x;
                             mini_edge.first.second = edge.first;
                             mini_edge.second = edge.second;
+                            cout << "Found min: " << "(" << mini_edge.first.first << ", " << mini_edge.first.second << "), " << mini_edge.second << endl;
                         }
+
                     }
                 }
+                cout << "next cycle!" << endl;
                 VminX.erase(mini_edge.first.second);
+                X.insert(mini_edge.first.second);
+                A[mini_edge.first.second] = mini_edge.second;
+                B[mini_edge.first.first].push_back(mini_edge.first.second);
             }
-        };
+
+        return pair<decltype(A), decltype(B)> {A,B};
+    };
 
         auto shortest_path_optim() {
             set<int> VminX, X, V;
@@ -241,6 +252,8 @@ class Graph {
 
         friend auto run_mc_shortest_path(const int &size, const double &density, const pair<double, double> &range);
 
+        friend auto run_mc_prims_mst(const int &size, const double &density, const pair<double, double> &range);
+
         friend ostream &operator<<(ostream &os, const Graph &graph);
 
 };
@@ -265,6 +278,25 @@ auto run_mc_shortest_path(const int &size, const double &density, const pair<dou
          << accumulate(begin(results.first) + 1, end(results.first), 0) / (size - 1.0) << endl;
 };
 
+auto run_mc_prims_mst(const int &size, const double &density, const pair<double, double> &range) {
+    cout << "running graph with size: " << size << "   " << "density: " << density << "   "
+         << "edge range: " << "(" << range.first << ", "  << range.second << ")" << endl;
+
+    Graph g{density, size, range};
+    cout << setprecision(5) << g << endl;
+
+    auto results = g.find_minimum_spanning_tree();
+    for (int i = 1; i < size; i++) {
+        cout << "MST for generated graph " << i << ": ";
+        for (const auto &v : results.second[i]) {
+            cout << v << " -> ";
+        }
+        cout << right << " (" << results.first[i] << ")" << endl;
+    }
+    cout << "MST total cost: "
+         << accumulate(begin(results.first) + 1, end(results.first), 0)<< endl;
+};
+
 
 ostream &operator<<(ostream &os, const Graph &g) {
     for (int i{0}; i < g.graph.size(); ++i) {
@@ -279,14 +311,20 @@ ostream &operator<<(ostream &os, const Graph &g) {
 
 
 int main() {
-    int size{50};
+//    int size{50};
+//    pair<double, double> range{0.00001, 10.};
+//
+//    double density1{0.20};
+//    run_mc_shortest_path(size, density1, range);
+//
+//    double density2{0.40};
+//    run_mc_shortest_path(size, density2, range);
+
+    int size{5};
     pair<double, double> range{0.00001, 10.};
 
-    double density1{0.20};
-    run_mc_shortest_path(size, density1, range);
-
-    double density2{0.40};
-    run_mc_shortest_path(size, density2, range);
+    double density1{0.90};
+    run_mc_prims_mst(size, density1, range);
 
     return 0;
 }
