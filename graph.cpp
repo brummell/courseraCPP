@@ -19,6 +19,7 @@ using namespace std;
 class Graph {
     double INF = numeric_limits<double>::infinity();
     int QNAN = numeric_limits<int>::quiet_NaN();
+    using min_edge = pair<pair<int, int>, double>;
 
     struct Vertex {
         int id;
@@ -61,16 +62,48 @@ public:
         }
     }
 
+    auto find_minimum_spanning_tree() {
+    // use Prim's algorithm to find a minimum spanning tree, here using a naive implementation
+        // remember, no node gets touched twice
+        // TODO: RIGHT NOW ASSUMING CONNECTED COMPONENT
+//        using min_edge = pair<pair<int, int>, double>
+        auto edge_cmp = [](const min_edge &left, const min_edge &right) { // lift this into higher namespace and reuse accross stl stuff
+            if (left.second != right.second) { return left.second < right.second; }
+            else if (left.first.first != right.first.first) { return left.first.first < right.first.first; }
+            else { return left.first.second < right.first.second; }
+        };
+
+        set<int> VminX, X, V;
+        vector<double> A(size, INF);
+        vector<vector<int>> B(size);
+        for (int i = 0; i < size; ++i) {
+            V.insert(i); // This can be optimed away probably
+            VminX.insert(i);
+        }
+
+        VminX.erase(0);
+        X.insert(0);
+        VminX.insert(0);
+        min_edge mini_edge{{QNAN, QNAN}, INF};
+        for (auto x : X) {
+            for (auto edge : graph[0].edges) {
+                if (VminX.count(edge.first and edge.second < mini_edge.second)) {
+                    mini_edge.first.first = x; mini_edge.first.second = edge.first; mini_edge.second = edge.second;
+                }
+            }
+        }
+        VminX.erase(mini_edge.first.second);
+    };
+
     auto shortest_path_optim() {
         set<int> VminX, X, V;
         vector<double> A(size, INF);
         vector<vector<int>> B(size);
         for (int i = 0; i < size; ++i) {
-            V.insert(i);
+            V.insert(i); // This can be optimed away probably
             VminX.insert(i);
         }
 
-        using min_edge = pair<pair<int, int>, double>;
         auto min_cmp = [](const min_edge &left, const min_edge &right) {
             if (left.second != right.second) { return left.second < right.second; }
             else if (left.first.second != right.first.second) { return left.first.second > right.first.second; }
