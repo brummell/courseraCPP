@@ -12,16 +12,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="add6c3c7-5d0e-4b7e-9463-56224e8aa3f7" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/MSTHW3.cpp" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/heap.hpp" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Grading1.cpp" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Grading2.cpp" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/Coursera.iml" afterPath="$PROJECT_DIR$/.idea/Coursera.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/CMakeLists.txt" afterPath="$PROJECT_DIR$/CMakeLists.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/graph.hpp" afterPath="$PROJECT_DIR$/graph.hpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/graphOCTBACKUP.cpp" afterPath="$PROJECT_DIR$/graphOCTBACKUP.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/graph_algorithms.cpp" afterPath="$PROJECT_DIR$/graph_algorithms.cpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MSTHW3.cpp" afterPath="$PROJECT_DIR$/MSTHW3.cpp" />
     </list>
     <ignored path="Coursera.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -56,8 +48,8 @@
           <file leaf-file-name="MSTHW3.cpp" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/MSTHW3.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="327">
-                  <caret line="140" column="38" selection-start-line="140" selection-start-column="38" selection-end-line="140" selection-end-column="38" />
+                <state relative-caret-position="100">
+                  <caret line="126" column="0" selection-start-line="126" selection-start-column="0" selection-end-line="126" selection-end-column="0" />
                   <folding>
                     <element signature="e#0#17#0" expanded="true" />
                   </folding>
@@ -102,8 +94,8 @@
           <file leaf-file-name="graph_algorithms.cpp" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/graph_algorithms.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1425">
-                  <caret line="108" column="67" selection-start-line="108" selection-start-column="67" selection-end-line="108" selection-end-column="67" />
+                <state relative-caret-position="255">
+                  <caret line="30" column="12" selection-start-line="30" selection-start-column="12" selection-end-line="30" selection-end-column="12" />
                   <folding />
                 </state>
               </provider>
@@ -148,6 +140,7 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
+    <option name="x" value="-56" />
     <option name="y" value="23" />
     <option name="width" value="1920" />
     <option name="height" value="1002" />
@@ -419,26 +412,26 @@
       <workItem from="1474690966722" duration="12990000" />
       <workItem from="1475547370592" duration="30000" />
       <workItem from="1476583408187" duration="6487000" />
-      <workItem from="1477266091538" duration="3070000" />
+      <workItem from="1477266091538" duration="5429000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="144995000" />
+    <option name="totallyTimeSpent" value="147354000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1920" height="1002" extended-state="6" />
-    <editor active="false" />
+    <frame x="-56" y="23" width="1920" height="1002" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.10742496" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.20769231" sideWeight="0.7245919" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3912088" sideWeight="0.7245919" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32747254" sideWeight="0.49289098" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2791209" sideWeight="0.50921535" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.43186814" sideWeight="0.49078462" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.43186814" sideWeight="0.49078462" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30694142" sideWeight="0.56029487" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30659342" sideWeight="0.56029487" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3991881" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -766,14 +759,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/graph_algorithms.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1425">
-          <caret line="108" column="67" selection-start-line="108" selection-start-column="67" selection-end-line="108" selection-end-column="67" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/graph.hpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1125">
@@ -824,10 +809,18 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/graph_algorithms.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="30" column="12" selection-start-line="30" selection-start-column="12" selection-end-line="30" selection-end-column="12" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/MSTHW3.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="327">
-          <caret line="140" column="38" selection-start-line="140" selection-start-column="38" selection-end-line="140" selection-end-column="38" />
+        <state relative-caret-position="100">
+          <caret line="126" column="0" selection-start-line="126" selection-start-column="0" selection-end-line="126" selection-end-column="0" />
           <folding>
             <element signature="e#0#17#0" expanded="true" />
           </folding>
