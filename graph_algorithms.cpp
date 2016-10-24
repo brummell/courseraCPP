@@ -22,19 +22,16 @@ class GraphAlgorithm {
     using min_edge = pair<pair<int, int>, double>;
 
 private:
-    // Random seed
-    random_device rand;
     const Graph &graph;
+    auto size;
 
 public:
-    // constructors
     GraphAlgorithm(const Graph &graph) : graph(graph) {
         auto vertices = graph.V();
-        auto size = vertices;
-
+        auto size = vertices.size();
     };
 
-    auto shortest_path_optim() {
+    auto generate_all_shortest_paths() {
         set<int> VminX, X, V;
         vector<double> A(size, INF);
         vector<vector<int>> B(size);
@@ -50,8 +47,7 @@ public:
         };
         set<min_edge, decltype(min_cmp)> vertex_heap(min_cmp);
 
-        auto greedy_criterion = [&](
-                int w) {  // returns min dijsktra greedy score for all edges in for A SINGLE vertex in V-X
+        auto greedy_criterion = [&](int w) {  // returns min dijsktra greedy score for all edges in for A SINGLE vertex in V-X
             double cost{INF};
             int v_star{QNAN}, w_star{w};
             for (auto const &v : graph[w].edges) {
@@ -68,7 +64,6 @@ public:
         };
 
         auto update_paths = [&](int v_star, int w_star, double cost) {
-            //
             A[w_star] = cost;
             X.insert(w_star);
             VminX.erase(VminX.find(w_star));
@@ -129,7 +124,8 @@ auto run_mc_shortest_path(const int &size, const double &density, const pair<dou
     Graph g{density, size, range};
     cout << setprecision(5) << g << endl;
 
-    auto results = g.shortest_path_optim();
+    GraphAlgorithm g_a{g};
+    auto results = g_a.generate_all_shortest_paths();
     for (int i = 1; i < size; i++) {
         cout << "shortest path to " << i << ": ";
         for (const auto &v : results.second[i]) {
@@ -143,19 +139,5 @@ auto run_mc_shortest_path(const int &size, const double &density, const pair<dou
 
 
 int main() {
-//    int size{50};
-//    pair<double, double> range{0.00001, 10.};
-//
-//    double density1{0.20};
-//    run_mc_shortest_path(size, density1, range);
-//
-//    double density2{0.40};
-//    run_mc_shortest_path(size, density2, range);
-
-    int size{5};
-    pair<double, double> range{0.00001, 10.};
-
-    double density1{0.90};
-
     return 0;
 }

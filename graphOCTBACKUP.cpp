@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <fstream>
 //THIS WILL FIND USE IN PGMS AS WELL AS HPC COMPUTATION GRAPH CALCULATIONS
 
 using namespace std;
@@ -39,6 +40,7 @@ class Graph {
         pair<int, int> edge_range;
         double target_density;
         int size; // TODO: change name
+        string filename;
         // Random seed
         random_device rand;
 
@@ -46,6 +48,9 @@ class Graph {
         // constructors
         Graph() : graph() {};
         // create random graph
+        Graph(string filename) : filename(filename) {
+            ifstream infile(filename);
+        }
         Graph(double target_density, int size, pair<int, int> edge_range) : target_density(
                 target_density), edge_range(edge_range), size(size), graph() {
             for (int i = 0; i < size; ++i) { graph.push_back(Vertex{i}); }
@@ -319,7 +324,7 @@ int main() {
 //
 //    double density2{0.40};
 //    run_mc_shortest_path(size, density2, range);
-
+    string filename{"thefile.txt"};
     int size{5};
     pair<double, double> range{0.00001, 10.};
 
